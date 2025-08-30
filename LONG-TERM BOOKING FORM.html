@@ -1,0 +1,2241 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Long-Term Domestic Help Booking - HS-PRO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2C3E73',  // Brand blue from Visual Brand Book
+                        accent: '#EF7C9F',   // Brand pink from Visual Brand Book
+                        success: '#22C55E',
+                        warning: '#FACC15',
+                        error: '#EF4444',
+                        darkText: '#2A2A2A',
+                        mutedText: '#6B7280',
+                        lightGray: '#F3F4F6',
+                        borderGray: '#E5E7EB',
+                        bronze: '#CD7F32',
+                        silver: '#C0C0C0',
+                        gold: '#FFD700',
+                        platinum: '#E5E4E2',
+                        diamond: '#B9F2FF'
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', 'sans-serif']
+                    },
+                    borderRadius: {
+                        'xl': '0.75rem'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .card {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .status-chip {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 20px 0 30px 0;
+        }
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 14px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #E5E7EB;
+            z-index: 1;
+        }
+        .step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
+        }
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #E5E7EB;
+            color: #6B7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: 600;
+        }
+        .step.active .step-number {
+            background-color: #2C3E73;
+            color: white;
+        }
+        .step.completed .step-number {
+            background-color: #22C55E;
+            color: white;
+        }
+        .step.completed .step-number::after {
+            content: '✓';
+        }
+        .step-label {
+            font-size: 0.75rem;
+            color: #6B7280;
+        }
+        .step.active .step-label {
+            color: #2C3E73;
+            font-weight: 500;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #2A2A2A;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.5rem;
+            font-family: 'Poppins', 'sans-serif';
+            transition: border-color 0.2s;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #2C3E73;
+            box-shadow: 0 0 0 3px rgba(44, 62, 115, 0.1);
+        }
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #E5E7EB;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background-color: #2C3E73;
+            transition: width 0.3s ease;
+        }
+        .task-tag {
+            padding: 6px 12px;
+            border-radius: 20px;
+            background-color: #E5E7EB;
+            color: #2A2A2A;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .task-tag.selected {
+            background-color: #2C3E73;
+            color: white;
+        }
+        .amenity-option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .amenity-option:hover {
+            border-color: #2C3E73;
+        }
+        .amenity-option.selected {
+            border-color: #2C3E73;
+            background-color: rgba(44, 62, 115, 0.05);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 0.75rem;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .signature-pad {
+            border: 1px solid #E5E7EB;
+            border-radius: 0.5rem;
+            height: 150px;
+            background-color: #F9FAFB;
+            position: relative;
+        }
+        .signature-pad canvas {
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+        .calculation-card {
+            background-color: #F8FAFC;
+            border-left: 4px solid #2C3E73;
+        }
+        .adjustment-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        .adjustment-item:last-child {
+            border-bottom: none;
+        }
+        .nanny-adjustment {
+            background-color: #FFF7ED;
+            border-left: 4px solid #FACC15;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        .tier-card {
+            border: 1px solid #E5E7EB;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tier-card:hover {
+            border-color: #2C3E73;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .tier-card.selected {
+            border-color: #2C3E73;
+            background-color: rgba(44, 62, 115, 0.05);
+        }
+        .tier-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+        .bronze {
+            background-color: #CD7F32;
+            color: white;
+        }
+        .silver {
+            background-color: #C0C0C0;
+            color: #2A2A2A;
+        }
+        .gold {
+            background-color: #FFD700;
+            color: #2A2A2A;
+        }
+        .platinum {
+            background-color: #E5E4E2;
+            color: #2A2A2A;
+        }
+        .diamond {
+            background-color: #B9F2FF;
+            color: #2A2A2A;
+        }
+        .tier-details {
+            font-size: 0.875rem;
+            color: #6B7280;
+        }
+        .agency-card {
+            border: 1px solid #E5E7EB;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .agency-card.selected {
+            border-color: #2C3E73;
+            background-color: rgba(44, 62, 115, 0.05);
+        }
+        .timeline-item {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+        .timeline-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #E5E7EB;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .timeline-content {
+            flex: 1;
+        }
+        .timeline-active .timeline-dot {
+            background-color: #2C3E73;
+            color: white;
+        }
+        .timeline-completed .timeline-dot::after {
+            content: '✓';
+            color: white;
+        }
+        .contract-preview {
+            max-height: 500px;
+            overflow-y: auto;
+            font-family: 'Times New Roman', serif;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .contract-section {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        .contract-title {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 16px;
+        }
+        .contract-subtitle {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 14px;
+        }
+        .contract-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .contract-header-item {
+            flex: 1;
+        }
+        .placeholder {
+            color: #6B7280;
+            font-style: italic;
+        }
+        .compliance-item {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background-color: #F8FAFC;
+            border-left: 3px solid #2C3E73;
+        }
+        .brand-header {
+            background-color: #2C3E73;
+            color: white;
+            padding: 1rem 0;
+        }
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .brand-logo i {
+            font-size: 2rem;
+            margin-right: 0.5rem;
+            color: #EF7C9F;
+        }
+        .brand-tagline {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+        @media (max-width: 768px) {
+            .step-label {
+                font-size: 0.6rem;
+            }
+            .step-number {
+                width: 25px;
+                height: 25px;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body class="font-poppins bg-lightGray text-darkText">
+    <!-- Brand Header -->
+    <div class="brand-header text-center">
+        <div class="container mx-auto px-4">
+            <div class="brand-logo justify-center">
+                <i class="fas fa-hands-helping"></i>
+                <span class="text-xl font-bold">HS-PRO</span>
+            </div>
+            <p class="brand-tagline">Structured Care. Empowered Work.</p>
+        </div>
+    </div>
+
+    <!-- Top Navigation Bar -->
+    <nav class="bg-white shadow-md py-4 px-4 md:px-6 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center">
+                <i class="fas fa-briefcase text-primary text-2xl mr-2"></i>
+                <span class="text-xl font-bold">HS-PRO</span>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-4 md:space-x-6">
+            <button class="relative text-darkText hover:text-primary">
+                <i class="fas fa-bell text-xl"></i>
+                <span class="absolute -top-1 -right-1 bg-accent text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+            </button>
+            <div class="relative group">
+                <button class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <i class="fas fa-chevron-down text-xs hidden md:block"></i>
+                </button>
+                <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block z-10">
+                    <a href="#" class="block px-4 py-2 text-darkText hover:bg-lightGray">Profile</a>
+                    <a href="#" class="block px-4 py-2 text-darkText hover:bg-lightGray">Settings</a>
+                    <a href="#" class="block px-4 py-2 text-darkText hover:bg-lightGray">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="p-4 md:p-6">
+        <div class="flex items-center mb-6">
+            <button class="text-primary mr-4" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div>
+                <h1 class="text-2xl font-bold">Long-Term Domestic Help Booking</h1>
+                <p class="text-mutedText">Premium feature for subscribed members only</p>
+            </div>
+        </div>
+
+        <!-- Restriction Message for Non-Premium Users -->
+        <div class="card p-6 mb-6 bg-warning bg-opacity-10 border border-warning">
+            <div class="flex items-start">
+                <i class="fas fa-exclamation-triangle text-warning text-xl mr-3 mt-1"></i>
+                <div>
+                    <h2 class="text-xl font-bold text-warning mb-2">Premium Membership Required</h2>
+                    <p class="mb-4">Long-term bookings are only available to subscribed members.</p>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button class="bg-primary text-white px-6 py-3 rounded-lg flex items-center justify-center" onclick="window.location.href='#'">
+                            <i class="fas fa-crown mr-2"></i> Upgrade to Premium
+                        </button>
+                        <button class="border border-borderGray text-darkText px-6 py-3 rounded-lg flex items-center justify-center" onclick="history.back()">
+                            <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Form (Visible only to Premium Users) -->
+        <div id="bookingForm">
+            <!-- Progress Bar -->
+            <div class="card p-6 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">Booking Progress</h2>
+                    <span class="text-sm text-mutedText">Step 1 of 5</span>
+                </div>
+                <div class="progress-bar mb-2">
+                    <div class="progress-fill" id="progressFill" style="width: 20%"></div>
+                </div>
+                <div class="step-indicator">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Job Details</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Living Conditions</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Worker Selection</div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-label">Agency Assignment</div>
+                    </div>
+                    <div class="step" data-step="5">
+                        <div class="step-number">5</div>
+                        <div class="step-label">Review & Pay</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Sections -->
+            <form id="longTermBookingForm">
+                <!-- Section 1: Job & Household Details -->
+                <div class="step-content active" data-step="1">
+                    <div class="card p-6 mb-6">
+                        <h2 class="text-xl font-bold mb-6">Job & Household Details</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="form-group">
+                                <label class="form-label">Primary Role</label>
+                                <select class="form-select" id="primaryRole" onchange="updateRoleFields()">
+                                    <option value="">Select Primary Role</option>
+                                    <option value="maid">Maid / Housekeeper</option>
+                                    <option value="nanny">Nanny / Child Care</option>
+                                    <option value="caregiver">Adult Caregiver</option>
+                                    <option value="combined">Combined Role</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Household Composition</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs text-mutedText mb-1">Adults (15+)</label>
+                                        <input type="number" class="form-input" id="adults" min="1" value="2" onchange="calculateWorkload()">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-mutedText mb-1">Children (0-3 yrs)</label>
+                                        <input type="number" class="form-input" id="children03" min="0" value="1" onchange="calculateWorkload()">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-mutedText mb-1">Children (4-7 yrs)</label>
+                                        <input type="number" class="form-input" id="children47" min="0" value="1" onchange="calculateWorkload()">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-mutedText mb-1">Children (8-14 yrs)</label>
+                                        <input type="number" class="form-input" id="children814" min="0" value="0" onchange="calculateWorkload()">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Home Details</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs text-mutedText mb-1">Bedrooms</label>
+                                        <input type="number" class="form-input" id="bedrooms" min="1" value="3" onchange="calculateWorkload()">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-mutedText mb-1">Bathrooms</label>
+                                        <input type="number" class="form-input" id="bathrooms" min="1" value="2" onchange="calculateWorkload()">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-mutedText mb-1">Kitchens</label>
+                                        <input type="number" class="form-input" id="kitchens" min="1" value="1" onchange="calculateWorkload()">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-mutedText mb-1">Additional Rooms</label>
+                                        <input type="number" class="form-input" id="additionalRooms" min="0" value="2" onchange="calculateWorkload()">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Additional Tasks</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2" id="cooking" onchange="calculateWorkload()"> Cooking
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2" id="laundry" onchange="calculateWorkload()"> Laundry
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2" id="grocery" onchange="calculateWorkload()"> Grocery Shopping
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2" id="petCare" onchange="calculateWorkload()"> Pet Care
+                                    </label>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="mr-2" id="otherTaskCheckbox" onchange="toggleOtherTask()"> Other
+                                        <input type="text" class="form-input ml-2 text-sm" id="otherTask" placeholder="Specify" style="display: none;" onchange="calculateWorkload()">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group" id="careNeeds" style="display: none;">
+                                <label class="form-label">Care Needs</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2" id="mobility" onchange="calculateWorkload()"> Mobility assistance required
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2" id="personalCare" onchange="calculateWorkload()"> Personal/private care required
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Standby Hours (per day)</label>
+                                <select class="form-select" id="standbyHours" onchange="calculateWorkload()">
+                                    <option value="1">1 hour</option>
+                                    <option value="2">2 hours</option>
+                                    <option value="3" selected>3 hours</option>
+                                    <option value="4">4 hours</option>
+                                    <option value="5">5 hours</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end">
+                            <button type="button" class="bg-primary text-white px-6 py-3 rounded-lg" onclick="nextStep(1)">
+                                Continue
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Living Conditions & Accommodation -->
+                <div class="step-content" data-step="2">
+                    <div class="card p-6 mb-6">
+                        <h2 class="text-xl font-bold mb-6">Living Conditions & Accommodation</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="form-group">
+                                <label class="form-label">Living Arrangement</label>
+                                <div class="space-y-3">
+                                    <div class="living-condition-card" onclick="selectLivingArrangement('live-in')">
+                                        <div class="flex items-center">
+                                            <input type="radio" name="livingArrangement" class="mr-3" id="liveInRadio">
+                                            <div>
+                                                <p class="font-medium">Live-in</p>
+                                                <p class="text-sm text-mutedText">Worker stays at employer's home</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="living-condition-card" onclick="selectLivingArrangement('live-out')">
+                                        <div class="flex items-center">
+                                            <input type="radio" name="livingArrangement" class="mr-3" id="liveOutRadio">
+                                            <div>
+                                                <p class="font-medium">Live-out</p>
+                                                <p class="text-sm text-mutedText">Worker commutes daily</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Work Cycle</label>
+                                <div class="space-y-3">
+                                    <div class="living-condition-card" onclick="selectWorkCycle('6+1')">
+                                        <div class="flex items-center">
+                                            <input type="radio" name="workCycle" class="mr-3" id="cycle61">
+                                            <div>
+                                                <p class="font-medium">6+1</p>
+                                                <p class="text-sm text-mutedText">6 days work + 1 day off</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="living-condition-card" onclick="selectWorkCycle('13+2')">
+                                        <div class="flex items-center">
+                                            <input type="radio" name="workCycle" class="mr-3" id="cycle132">
+                                            <div>
+                                                <p class="font-medium">13+2</p>
+                                                <p class="text-sm text-mutedText">13 days work + 2 days off</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="living-condition-card" onclick="selectWorkCycle('26+4')">
+                                        <div class="flex items-center">
+                                            <input type="radio" name="workCycle" class="mr-3" id="cycle264">
+                                            <div>
+                                                <p class="font-medium">26+4</p>
+                                                <p class="text-sm text-mutedText">26 days work + 4 days off</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Live-in Specific Fields -->
+                        <div id="liveInFields" style="display: none;">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div class="form-group">
+                                    <label class="form-label">Room Type</label>
+                                    <select class="form-select" id="roomType" onchange="calculateWorkload()">
+                                        <option>Private Room</option>
+                                        <option>Shared Room</option>
+                                        <option>Converted Space</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Payment Cycle</label>
+                                    <select class="form-select" id="paymentCycle" onchange="calculateSalary()">
+                                        <option>Weekly</option>
+                                        <option>Biweekly</option>
+                                        <option selected>Monthly</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Meal Plan</label>
+                                    <select class="form-select" id="mealPlan" onchange="calculateWorkload()">
+                                        <option>1-1-1 (Breakfast, Lunch, Dinner)</option>
+                                        <option>1-0-1 (Breakfast and Dinner)</option>
+                                        <option>0-0-1 (Dinner only)</option>
+                                        <option>No meals provided</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Feeding Allowance (Optional)</label>
+                                    <input type="text" class="form-input" placeholder="e.g., EGP 500/month for groceries" id="feedingAllowance">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group mb-6">
+                                <label class="form-label">Amenities Provided</label>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    <label class="amenity-option">
+                                        <input type="checkbox" class="mr-2" id="wifi"> Wi-Fi
+                                    </label>
+                                    <label class="amenity-option">
+                                        <input type="checkbox" class="mr-2" id="ac"> A/C
+                                    </label>
+                                    <label class="amenity-option">
+                                        <input type="checkbox" class="mr-2" id="tv"> TV
+                                    </label>
+                                    <label class="amenity-option">
+                                        <input type="checkbox" class="mr-2" id="laundryAmenity"> Laundry
+                                    </label>
+                                    <label class="amenity-option">
+                                        <input type="checkbox" class="mr-2" id="heater"> Heater
+                                    </label>
+                                    <label class="amenity-option">
+                                        <input type="checkbox" class="mr-2" id="privateBathroom"> Private Bathroom
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Live-out Specific Fields -->
+                        <div id="liveOutFields" style="display: none;">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label class="form-label">Transport Allowance</label>
+                                    <input type="text" class="form-input" placeholder="e.g., EGP 300/month" id="transportAllowance">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">External Lodge Provided</label>
+                                    <select class="form-select" id="externalLodge" onchange="toggleAccommodationAllowance()">
+                                        <option>No</option>
+                                        <option>Yes</option>
+                                    </select>
+                                </div>
+                                <div class="form-group md:col-span-2" id="accommodationAllowanceField" style="display: none;">
+                                    <label class="form-label">Accommodation Allowance</label>
+                                    <input type="text" class="form-input" placeholder="e.g., EGP 1000/month" id="accommodationAllowance">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <button type="button" class="border border-borderGray text-darkText px-6 py-3 rounded-lg" onclick="prevStep(2)">
+                                <i class="fas fa-arrow-left mr-2"></i> Back
+                            </button>
+                            <button type="button" class="bg-primary text-white px-6 py-3 rounded-lg" onclick="nextStep(2)">
+                                Continue
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Worker Selection -->
+                <div class="step-content" data-step="3">
+                    <div class="card p-6 mb-6">
+                        <h2 class="text-xl font-bold mb-6">Worker Selection & Salary Estimation</h2>
+                        
+                        <div class="form-group mb-6">
+                            <label class="form-label">Worker Tier / Experience Level</label>
+                            <p class="text-sm text-mutedText mb-4">Based on consecutive ratings and completed work cycles</p>
+                            
+                            <div class="space-y-3 mb-6">
+                                <!-- Entry Level -->
+                                <div class="tier-card" onclick="selectWorkerTier('entry')">
+                                    <div class="flex items-center">
+                                        <div class="tier-icon" style="background-color: #2C3E73; color: white;">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                        <div>
+                                            <div class="flex items-center">
+                                                <h4 class="font-bold">Entry Level</h4>
+                                                <span class="ml-2 bg-primary text-white text-xs px-2 py-1 rounded">Base Salary</span>
+                                            </div>
+                                            <div class="tier-details">
+                                                <p>Less than 10 consecutive ratings: 3.0+</p>
+                                                <p>Less than 10 work cycles completed</p>
+                                                <p>Minimum salary: EGP 8,000/month</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Bronze Tier -->
+                                <div class="tier-card" onclick="selectWorkerTier('bronze')">
+                                    <div class="flex items-center">
+                                        <div class="tier-icon bronze">
+                                            <i class="fas fa-medal"></i>
+                                        </div>
+                                        <div>
+                                            <div class="flex items-center">
+                                                <h4 class="font-bold">Bronze</h4>
+                                                <span class="ml-2 bg-bronze text-white text-xs px-2 py-1 rounded">+10-20%</span>
+                                            </div>
+                                            <div class="tier-details">
+                                                <p>Min 10 consecutive ratings: 3.0+</p>
+                                                <p>Min 10 work cycles completed</p>
+                                                <p>Minimum salary: EGP 8,800/month</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Silver Tier -->
+                                <div class="tier-card" onclick="selectWorkerTier('silver')">
+                                    <div class="flex items-center">
+                                        <div class="tier-icon silver">
+                                            <i class="fas fa-medal"></i>
+                                        </div>
+                                        <div>
+                                            <div class="flex items-center">
+                                                <h4 class="font-bold">Silver</h4>
+                                                <span class="ml-2 bg-silver text-darkText text-xs px-2 py-1 rounded">+15-30%</span>
+                                            </div>
+                                            <div class="tier-details">
+                                                <p>Min 15 consecutive ratings: 3.5+</p>
+                                                <p>Min 25 work cycles completed</p>
+                                                <p>Minimum salary: EGP 9,200/month</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Gold Tier -->
+                                <div class="tier-card" onclick="selectWorkerTier('gold')">
+                                    <div class="flex items-center">
+                                        <div class="tier-icon gold">
+                                            <i class="fas fa-medal"></i>
+                                        </div>
+                                        <div>
+                                            <div class="flex items-center">
+                                                <h4 class="font-bold">Gold</h4>
+                                                <span class="ml-2 bg-gold text-darkText text-xs px-2 py-1 rounded">+25-40%</span>
+                                            </div>
+                                            <div class="tier-details">
+                                                <p>Min 20 consecutive ratings: 4.0+</p>
+                                                <p>Min 50 work cycles completed</p>
+                                                <p>Minimum salary: EGP 10,000/month</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Platinum Tier -->
+                                <div class="tier-card" onclick="selectWorkerTier('platinum')">
+                                    <div class="flex items-center">
+                                        <div class="tier-icon platinum">
+                                            <i class="fas fa-medal"></i>
+                                        </div>
+                                        <div>
+                                            <div class="flex items-center">
+                                                <h4 class="font-bold">Platinum</h4>
+                                                <span class="ml-2 bg-platinum text-darkText text-xs px-2 py-1 rounded">+35-60%</span>
+                                            </div>
+                                            <div class="tier-details">
+                                                <p>Min 25 consecutive ratings: 4.5+</p>
+                                                <p>Min 75 work cycles completed</p>
+                                                <p>Minimum salary: EGP 10,800/month</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Diamond Tier -->
+                                <div class="tier-card" onclick="selectWorkerTier('diamond')">
+                                    <div class="flex items-center">
+                                        <div class="tier-icon diamond">
+                                            <i class="fas fa-gem"></i>
+                                        </div>
+                                        <div>
+                                            <div class="flex items-center">
+                                                <h4 class="font-bold">Diamond</h4>
+                                                <span class="ml-2 bg-diamond text-darkText text-xs px-2 py-1 rounded">+45-70%</span>
+                                            </div>
+                                            <div class="tier-details">
+                                                <p>Min 30 consecutive ratings: 4.8+</p>
+                                                <p>Min 100 work cycles completed</p>
+                                                <p>Minimum salary: EGP 11,600/month</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <input type="hidden" id="workerTier" value="entry">
+                        </div>
+                        
+                        <!-- Nanny Adjustment Notice -->
+                        <div class="nanny-adjustment mb-6 hidden" id="nannyAdjustmentNotice">
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-triangle text-warning mr-3 mt-1"></i>
+                                <div>
+                                    <p class="font-bold text-warning">Special Adjustment for Mixed Age Groups</p>
+                                    <p class="text-sm">When caring for children under 3 years old along with older children, the workload is based on the younger child's needs (9-12 hrs/day). An additional +0.25% hourly rate adjustment is applied for each additional child beyond the first.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Calculation Results -->
+                        <div class="card calculation-card p-6 mb-6">
+                            <h3 class="text-lg font-bold mb-4">Workload & Salary Estimation</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <p class="text-mutedText text-sm">Estimated Daily Workload</p>
+                                    <p class="text-2xl font-bold" id="dailyWorkload">8.5 hours</p>
+                                </div>
+                                <div>
+                                    <p class="text-mutedText text-sm">Estimated Hourly Rate</p>
+                                    <p class="text-2xl font-bold" id="hourlyRate">EGP 46.15</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-lightGray rounded-lg p-4 mb-6">
+                                <p class="text-mutedText text-sm">Estimated Monthly Salary Range</p>
+                                <p class="text-2xl font-bold" id="monthlySalary">EGP 9,000 – EGP 12,000</p>
+                            </div>
+                            
+                            <div class="border border-borderGray rounded-lg p-4 mb-6">
+                                <h4 class="font-bold mb-3">Calculation Breakdown</h4>
+                                <div class="space-y-2 text-sm" id="calculationBreakdown">
+                                    <div class="adjustment-item">
+                                        <span>Base Role Hours</span>
+                                        <span>8.0 hours</span>
+                                    </div>
+                                    <div class="adjustment-item">
+                                        <span>Additional Adjustments</span>
+                                        <span>+0.5 hours</span>
+                                    </div>
+                                    <div class="adjustment-item">
+                                        <span>Standby Hours (3 × 0.15)</span>
+                                        <span>+0.45 hours</span>
+                                    </div>
+                                    <div class="adjustment-item">
+                                        <span>Tier Multiplier</span>
+                                        <span>× 1.20</span>
+                                    </div>
+                                    <div class="adjustment-item">
+                                        <span>Rating Adjustment</span>
+                                        <span>+10%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-warning bg-opacity-10 border border-warning rounded-lg p-4">
+                                <p class="text-sm"><strong>Disclaimer:</strong> Estimates are based on standard workload and current market tier rates; actual offers may vary based on negotiation and specific requirements.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <button type="button" class="border border-borderGray text-darkText px-6 py-3 rounded-lg" onclick="prevStep(3)">
+                                <i class="fas fa-arrow-left mr-2"></i> Back
+                            </button>
+                            <button type="button" class="bg-primary text-white px-6 py-3 rounded-lg" onclick="nextStep(3)">
+                                Continue
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Agency Assignment -->
+                <div class="step-content" data-step="4">
+                    <div class="card p-6 mb-6">
+                        <h2 class="text-xl font-bold mb-6">Agency Assignment & Processing Timeline</h2>
+                        
+                        <div class="form-group mb-6">
+                            <label class="form-label">Primary Agency</label>
+                            <div class="agency-card selected">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="font-bold">BrightHands Agency</h3>
+                                        <p class="text-sm text-mutedText">Auto-assigned from referral</p>
+                                        <div class="flex items-center mt-1">
+                                            <i class="fas fa-star text-warning mr-1"></i>
+                                            <span class="text-sm">4.8 ★ (127 reviews)</span>
+                                        </div>
+                                        <div class="flex items-center mt-1">
+                                            <i class="fas fa-map-marker-alt text-mutedText mr-1"></i>
+                                            <span class="text-sm">Downtown, Cairo</span>
+                                        </div>
+                                    </div>
+                                    <span class="status-chip bg-success bg-opacity-20 text-success">Assigned</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-6">
+                            <label class="form-label">Booking Type & Fulfillment Timeline</label>
+                            <div class="border border-borderGray rounded-lg p-4">
+                                <div class="flex items-start">
+                                    <input type="radio" name="bookingType" class="mr-3 mt-1" id="instantBooking" checked onchange="updateTimeline()">
+                                    <div>
+                                        <h4 class="font-medium">Instant Booking (Start Date: Today)</h4>
+                                        <p class="text-sm text-mutedText">Primary agency has 72 hours to fulfill placement</p>
+                                        <p class="text-sm text-warning mt-1"><i class="fas fa-exclamation-triangle mr-1"></i> If not fulfilled, fallback agencies will be contacted</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="border border-borderGray rounded-lg p-4 mt-3">
+                                <div class="flex items-start">
+                                    <input type="radio" name="bookingType" class="mr-3 mt-1" id="futureBooking" onchange="updateTimeline()">
+                                    <div>
+                                        <h4 class="font-medium">Future Date Booking</h4>
+                                        <p class="text-sm text-mutedText">Specify start date for fulfillment</p>
+                                        <input type="date" class="form-input mt-2" id="startDate" onchange="updateTimeline()">
+                                        <p class="text-sm text-warning mt-1"><i class="fas fa-exclamation-triangle mr-1"></i> Agency has 48 hours from booking submission to fulfill</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="border border-borderGray rounded-lg p-4 mt-3">
+                                <div class="flex items-start">
+                                    <input type="radio" name="bookingType" class="mr-3 mt-1" id="crossBorderBooking" onchange="updateTimeline()">
+                                    <div>
+                                        <h4 class="font-medium">Cross-Border Recruitment & Sponsorship</h4>
+                                        <p class="text-sm text-mutedText">International worker recruitment with visa sponsorship</p>
+                                        <p class="text-sm text-warning mt-1"><i class="fas fa-exclamation-triangle mr-1"></i> Maximum processing time: 21 days</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-6" id="fallbackAgenciesSection">
+                            <label class="form-label">Fallback Agencies (Optional)</label>
+                            <p class="text-sm text-mutedText mb-3">Will be contacted if primary agency cannot fulfill within the specified timeframe</p>
+                            
+                            <div class="space-y-3">
+                                <div class="agency-card" onclick="selectFallbackAgency(this)">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-medium">CareComm Agency</h3>
+                                            <p class="text-sm text-mutedText">4.7 ★ (98 reviews) • Nasr City, Cairo</p>
+                                        </div>
+                                        <input type="checkbox" class="mt-1">
+                                    </div>
+                                </div>
+                                
+                                <div class="agency-card" onclick="selectFallbackAgency(this)">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-medium">HomeHelpers Agency</h3>
+                                            <p class="text-sm text-mutedText">4.6 ★ (76 reviews) • Maadi, Cairo</p>
+                                        </div>
+                                        <input type="checkbox" class="mt-1">
+                                    </div>
+                                </div>
+                                
+                                <div class="agency-card" onclick="selectFallbackAgency(this)">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-medium">FamilyFirst Agency</h3>
+                                            <p class="text-sm text-mutedText">4.9 ★ (156 reviews) • Heliopolis, Cairo</p>
+                                        </div>
+                                        <input type="checkbox" class="mt-1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Processing Timeline -->
+                        <div class="border border-borderGray rounded-lg p-6 mb-6">
+                            <h4 class="font-bold mb-4">Processing Timeline</h4>
+                            <div class="space-y-4" id="timelineContainer">
+                                <div class="timeline-item timeline-completed">
+                                    <div class="timeline-dot">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="timeline-content">
+                                        <h5 class="font-medium">Booking Submitted</h5>
+                                        <p class="text-sm text-mutedText">Your booking request has been submitted to BrightHands Agency</p>
+                                        <p class="text-sm text-mutedText mt-1">Today, 10:30 AM</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item timeline-active">
+                                    <div class="timeline-dot">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="timeline-content">
+                                        <h5 class="font-medium">Agency Processing</h5>
+                                        <p class="text-sm text-mutedText">BrightHands Agency has 72 hours to fulfill your request</p>
+                                        <p class="text-sm text-warning mt-1">Deadline: <span id="deadline">Oct 15, 2023, 10:30 AM</span></p>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item">
+                                    <div class="timeline-dot">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="timeline-content">
+                                        <h5 class="font-medium">Candidate Shortlisting</h5>
+                                        <p class="text-sm text-mutedText">Agency will shortlist qualified candidates for interview</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item">
+                                    <div class="timeline-dot">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </div>
+                                    <div class="timeline-content">
+                                        <h5 class="font-medium">Interview Scheduling</h5>
+                                        <p class="text-sm text-mutedText">You will receive interview invitations for your approval</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item">
+                                    <div class="timeline-dot">
+                                        <i class="fas fa-file-contract"></i>
+                                    </div>
+                                    <div class="timeline-content">
+                                        <h5 class="font-medium">Contract Finalization</h5>
+                                        <p class="text-sm text-mutedText">Digital contract signing and payment processing</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-warning bg-opacity-10 border border-warning rounded-lg p-4 mb-6">
+                            <p class="text-sm"><strong>Important:</strong> Fallback agencies will only be contacted if the primary agency fails to fulfill the request within 12 hours of the deadline, or if the agency has no available affiliate slots.</p>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <button type="button" class="border border-borderGray text-darkText px-6 py-3 rounded-lg" onclick="prevStep(4)">
+                                <i class="fas fa-arrow-left mr-2"></i> Back
+                            </button>
+                            <button type="button" class="bg-primary text-white px-6 py-3 rounded-lg" onclick="nextStep(4)">
+                                Continue
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 5: Review & Submit -->
+                <div class="step-content" data-step="5">
+                    <div class="card p-6 mb-6">
+                        <h2 class="text-xl font-bold mb-6">Review & Submit</h2>
+                        
+                        <div class="border border-borderGray rounded-lg p-5 mb-6">
+                            <h3 class="font-bold mb-4">Booking Summary</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-mutedText text-xs">Primary Role</p>
+                                    <p class="font-medium" id="summaryRole">Nanny / Child Care</p>
+                                </div>
+                                <div>
+                                    <p class="text-mutedText text-xs">Household Composition</p>
+                                    <p class="font-medium" id="summaryHousehold">2 Adults, 1 Child (0-3 yrs)</p>
+                                </div>
+                                <div>
+                                    <p class="text-mutedText text-xs">Home Details</p>
+                                    <p class="font-medium" id="summaryHome">3 Bedrooms, 2 Bathrooms</p>
+                                </div>
+                                <div>
+                                    <p class="text-mutedText text-xs">Additional Tasks</p>
+                                    <p class="font-medium" id="summaryTasks">Cooking, Laundry</p>
+                                </div>
+                                <div>
+                                    <p class="text-mutedText text-xs">Standby Hours</p>
+                                    <p class="font-medium" id="summaryStandby">3 hours/day</p>
+                                </div>
+                                <div>
+                                    <p class="text-mutedText text-xs">Worker Tier</p>
+                                    <p class="font-medium" id="summaryTier">Entry Level</p>
+                                </div>
+                                <div>
+                                    <p class="text-mutedText text-xs">Estimated Workload</p>
+                                    <p class="font-medium" id="summaryWorkload">8.5 hours/day</p>
+                                </div>
+                                <div>
+                                    <p class="text-mutedText text-xs">Estimated Salary</p>
+                                    <p class="font-medium" id="summarySalary">EGP 9,000 – EGP 12,000</p>
+                                </div>
+                                <div>
+                                    <p class="text-mutedText text-xs">Living Arrangement</p>
+                                    <p class="font-medium" id="summaryLiving">Live-in</p>
+                                </div>
+                                <div>
+                                    <p class="text-mutedText text-xs">Work Cycle</p>
+                                    <p class="font-medium" id="summaryCycle">13+2</p>
+                                </div>
+                                <div>
+                                    <p class="text-mutedText text-xs">Payment Cycle</p>
+                                    <p class="font-medium" id="summaryPayment">Monthly</p>
+                                </div>
+                                <div>
+                                    <p class="text-mutedText text-xs">Accommodation</p>
+                                    <p class="font-medium" id="summaryAccommodation">Private Room</p>
+                                </div>
+                                <div>
+                                    <p class="text-mutedText text-xs">Primary Agency</p>
+                                    <p class="font-medium">BrightHands Agency</p>
+                                </div>
+                                <div>
+                                    <p class="text-mutedText text-xs">Booking Type</p>
+                                    <p class="font-medium" id="summaryBookingType">Instant Booking</p>
+                                </div>
+                                <div>
+                                    <p class="text-mutedText text-xs">Processing Time</p>
+                                    <p class="font-medium" id="summaryProcessingTime">72 hours</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="border border-borderGray rounded-lg p-5 mb-6">
+                            <h3 class="font-bold mb-4">Contract Preview</h3>
+                            <div class="flex items-center justify-between p-3 border border-borderGray rounded-lg mb-3" onclick="openModal('contractModal')">
+                                <span>Employment Agreement</span>
+                                <button class="text-primary text-sm">
+                                    <i class="fas fa-eye mr-1"></i> View Draft
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between p-3 border border-borderGray rounded-lg" onclick="openModal('complianceModal')">
+                                <span>Compliance Clauses</span>
+                                <button class="text-primary text-sm">
+                                    <i class="fas fa-eye mr-1"></i> View Details
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-6">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2" id="termsAgree">
+                                <span>I agree to the terms and conditions and have reviewed the contract draft</span>
+                            </label>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <button type="button" class="border border-borderGray text-darkText px-6 py-3 rounded-lg" onclick="prevStep(5)">
+                                <i class="fas fa-arrow-left mr-2"></i> Back
+                            </button>
+                            <button type="button" class="bg-primary text-white px-6 py-3 rounded-lg" onclick="submitBooking()" id="submitBtn" disabled>
+                                <i class="fas fa-file-contract mr-2"></i> Sign & Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Digital Signature Modal -->
+    <div class="modal" id="signatureModal">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Digital Signature Required</h3>
+                <button class="text-mutedText" onclick="closeModal('signatureModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="bg-warning bg-opacity-10 border border-warning rounded-lg p-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-exclamation-triangle text-warning mr-3 mt-1"></i>
+                        <div>
+                            <p class="font-bold text-warning">Action Required</p>
+                            <p class="text-sm">Please sign the employment agreement to complete your booking.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-3">Your Signature</h4>
+                    <div class="signature-pad mb-4">
+                        <canvas id="signatureCanvas"></canvas>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button class="flex-1 border border-borderGray text-darkText py-2 rounded-lg text-sm" onclick="clearSignature()">
+                            Clear
+                        </button>
+                        <button class="flex-1 bg-primary text-white py-2 rounded-lg text-sm" onclick="saveSignature()">
+                            Save Signature
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end gap-3 pt-4">
+                    <button class="border border-borderGray text-darkText px-6 py-2 rounded-lg" onclick="closeModal('signatureModal')">
+                        Cancel
+                    </button>
+                    <button class="bg-primary text-white px-6 py-2 rounded-lg" onclick="finalizeBooking()">
+                        Sign & Complete Booking
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contract Preview Modal -->
+    <div class="modal" id="contractModal">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Employment Agreement Draft</h3>
+                <button class="text-mutedText" onclick="closeModal('contractModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="contract-preview">
+                <div class="contract-section">
+                    <div class="contract-title">Domestic Worker Employment Contract</div>
+                    <div class="contract-subtitle">Egypt – ILO C189 – IOM IRIS Compliant – Agency Mediated</div>
+                    <div class="contract-header">
+                        <div class="contract-header-item">
+                            <strong>Contract No.:</strong> <span class="placeholder">[AUTO_GENERATED_ID]</span>
+                        </div>
+                        <div class="contract-header-item">
+                            <strong>Date of Issue:</strong> <span class="placeholder">[DD/MM/YYYY]</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contract-section">
+                    <div class="contract-title">Section 1 – Parties to the Contract</div>
+                    <div class="contract-header">
+                        <div class="contract-header-item">
+                            <strong>Employer (Family Head):</strong><br>
+                            Full Name: <span class="placeholder">[EMPLOYER_FULL_NAME]</span><br>
+                            Nationality: <span class="placeholder">[EMPLOYER_NATIONALITY]</span><br>
+                            Address: <span class="placeholder">[EMPLOYER_ADDRESS]</span><br>
+                            Telephone: <span class="placeholder">[EMPLOYER_PHONE]</span><br>
+                            Email: <span class="placeholder">[EMPLOYER_EMAIL]</span><br>
+                            Emergency Contact Name & Number: <span class="placeholder">[EMPLOYER_EMERGENCY_CONTACT]</span>
+                        </div>
+                        <div class="contract-header-item">
+                            <strong>Employee (Domestic Worker):</strong><br>
+                            Full Name: <span class="placeholder">[WORKER_FULL_NAME]</span><br>
+                            Nationality: <span class="placeholder">[WORKER_NATIONALITY]</span><br>
+                            Permanent Address: <span class="placeholder">[WORKER_ADDRESS]</span><br>
+                            Telephone: <span class="placeholder">[WORKER_PHONE]</span><br>
+                            Email (if applicable): <span class="placeholder">[WORKER_EMAIL]</span><br>
+                            Language of Contract Delivery: <span class="placeholder">[LANGUAGE]</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contract-section">
+                    <div class="contract-title">Section 2 – Purpose of the Contract</div>
+                    <p>This contract is concluded in accordance with Egyptian domestic worker regulations and incorporates the protections provided by: ILO Convention No. 189 concerning Decent Work for Domestic Workers; IOM IRIS Ethical Recruitment Standards, ensuring transparent, fair, and lawful recruitment with no fees charged to the worker.</p>
+                </div>
+                
+                <div class="contract-section">
+                    <div class="contract-title">Section 3 – Job Description</div>
+                    <p>The Employee shall perform the following agreed duties: <span class="placeholder">[List duties in detail: e.g., cleaning, laundry, cooking, childcare, eldercare, errands]</span>. Any changes to duties must be mutually agreed in writing, with any necessary adjustment to wages or working conditions.</p>
+                </div>
+                
+                <div class="contract-section">
+                    <div class="contract-title">Section 4 – Contract Duration</div>
+                    <p>Start Date: <span class="placeholder">[DD/MM/YYYY]</span><br>
+                    End Date: <span class="placeholder">[DD/MM/YYYY]</span> (or "One year from start date, renewable")<br>
+                    In absence of specified end date, contract is valid for one (1) year, automatically renewable unless terminated as per Section 11.</p>
+                </div>
+                
+                <div class="contract-section">
+                    <div class="contract-title">Section 5 – Probation Period</div>
+                    <p>Probation period shall be <span class="placeholder">[X]</span> months (max 3). Either party may terminate contract with <span class="placeholder">[X]</span> days written notice during probation.</p>
+                </div>
+                
+                <div class="contract-section">
+                    <div class="contract-title">Section 6 – Wages and Benefits</div>
+                    <p>Monthly Wage: <span class="placeholder">[AMOUNT_EGP]</span> Egyptian Pounds<br>
+                    Payment Method: <span class="placeholder">[Cash/Bank Transfer]</span><br>
+                    Payment Frequency: <span class="placeholder">[Monthly/Bi-weekly]</span><br>
+                    In-Kind Benefits (if any): <span class="placeholder">[Specify meals, accommodation, transport, etc.]</span><br>
+                    Wages shall be paid in full and on time without unlawful deductions, in accordance with Egyptian law and ILO C189 standards.</p>
+                </div>
+                
+                <div class="contract-section">
+                    <div class="contract-title">Section 7 – Working Hours and Rest</div>
+                    <p>Daily Working Hours: <span class="placeholder">[X]</span> hours (not exceeding national legal maximum)<br>
+                    Weekly Rest: At least 24 consecutive hours on <span class="placeholder">[Day]</span><br>
+                    Overtime Work: Paid at agreed overtime rate or compensated with equivalent rest time.</p>
+                </div>
+                
+                <div class="contract-section">
+                    <div class="contract-title">Section 8 – Rights and Obligations</div>
+                    <p><strong>Employer's Obligations:</strong><br>
+                    • Provide a safe and healthy working environment.<br>
+                    • Respect the worker's dignity, privacy, and fundamental rights.<br>
+                    • Provide agreed wages and benefits promptly.<br>
+                    • Provide written terms in a language the worker understands.<br>
+                    • Not retain the worker's passport or identity documents without consent.</p>
+                    
+                    <p><strong>Worker's Obligations:</strong><br>
+                    • Perform duties responsibly and with due care.<br>
+                    • Respect household rules and maintain confidentiality.<br>
+                    • Use household property and equipment responsibly.</p>
+                </div>
+                
+                <div class="contract-section">
+                    <div class="contract-title">Section 9 – Ethical Recruitment Commitments</div>
+                    <p>This contract confirms that:<br>
+                    • The worker has not paid any recruitment fees or related costs to obtain this employment.<br>
+                    • The worker received accurate and complete information on terms and conditions before signing.<br>
+                    • The worker has given free and informed consent to this contract.</p>
+                </div>
+                
+                <div class="contract-section">
+                    <div class="contract-title">Section 10 – Dispute Resolution</div>
+                    <p>Any disputes shall first be addressed through amicable settlement or mediation, facilitated by the recruiting agency. If unresolved, the dispute shall be referred to the competent Egyptian authorities under applicable law.</p>
+                    
+                    <p><strong>Platform Dispute Resolution Protocol:</strong> If the agency fails to resolve the dispute, parties may escalate the case to the HS-Pro/Jobbazaa platform's integrated dispute resolution system, which provides:<br>
+                    • Secure complaint registration<br>
+                    • Automatic assignment to an independent mediator<br>
+                    • Transparent case tracking<br>
+                    • Appeal options before a mediation/arbitration committee<br>
+                    Decisions made through the platform are binding and comply with Egyptian law.</p>
+                </div>
+                
+                <div class="contract-section">
+                    <div class="contract-title">Section 11 – Termination of Contract</div>
+                    <p>• During probation: Either party may terminate with <span class="placeholder">[X]</span> days notice.<br>
+                    • After probation: Termination requires <span class="placeholder">[X]</span> days written notice or payment in lieu.<br>
+                    • Immediate termination without notice is permitted in cases of gross misconduct, abuse, or violation of rights.</p>
+                </div>
+                
+                <div class="contract-section">
+                    <div class="contract-title">Section 12 – Governing Law</div>
+                    <p>This contract is governed by the laws of the Arab Republic of Egypt. In case of conflict between language versions, the Arabic version shall prevail.</p>
+                </div>
+                
+                <div class="contract-section">
+                    <div class="contract-title">Section 13 – Signatures and Acknowledgment</div>
+                    <p>This contract is executed in Arabic, English, and French. The worker confirms having received and understood the version in their preferred language.</p>
+                    
+                    <div class="contract-header mt-4">
+                        <div class="contract-header-item">
+                            Employer: ___________________ Date:  / /2025
+                        </div>
+                        <div class="contract-header-item">
+                            Employee: ___________________ Date:  / /2025
+                        </div>
+                    </div>
+                    <div class="contract-header mt-2">
+                        <div class="contract-header-item">
+                            Translator (if applicable): ___________________ Date:  / /2025
+                        </div>
+                        <div class="contract-header-item">
+                            Agency Representative: ___________________ Date:  / /2025
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end mt-6">
+                <button class="border border-borderGray text-darkText px-6 py-2 rounded-lg" onclick="closeModal('contractModal')">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Compliance Clauses Preview Modal -->
+    <div class="modal" id="complianceModal">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Compliance Clauses</h3>
+                <button class="text-mutedText" onclick="closeModal('complianceModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="compliance-item">
+                    <h4 class="font-bold">ILO Convention No. 189 Compliance</h4>
+                    <p>This contract complies with ILO Convention No. 189 concerning Decent Work for Domestic Workers, ensuring that domestic workers receive the same level of protection as other workers, including minimum wage, working hours limits, and rest periods.</p>
+                </div>
+                
+                <div class="compliance-item">
+                    <h4 class="font-bold">IOM IRIS Ethical Recruitment Standards</h4>
+                    <p>The recruitment process adheres to IOM's IRIS (International Recruitment Integrity System) standards, which ensure transparent, fair, and lawful recruitment with no fees charged to the worker. This protects workers from exploitation and debt bondage.</p>
+                </div>
+                
+                <div class="compliance-item">
+                    <h4 class="font-bold">Egyptian Ministry of Manpower Regulations</h4>
+                    <p>This contract is issued under Egyptian domestic worker regulations, incorporating all legal requirements for domestic worker employment in Egypt, including contract duration, probation periods, and termination procedures.</p>
+                </div>
+                
+                <div class="compliance-item">
+                    <h4 class="font-bold">Anti-Forced Labor and Human Trafficking Prevention</h4>
+                    <p>The contract includes provisions to prevent forced labor and human trafficking, including the worker's right to retain their passport, freedom of movement, and the ability to terminate the contract with proper notice.</p>
+                </div>
+                
+                <div class="compliance-item">
+                    <h4 class="font-bold">Non-Discrimination and Equal Treatment</h4>
+                    <p>The employer agrees to provide equal treatment regardless of the worker's nationality, race, religion, or gender, in accordance with international human rights standards and Egyptian law.</p>
+                </div>
+                
+                <div class="compliance-item">
+                    <h4 class="font-bold">Health and Safety Standards</h4>
+                    <p>The employer is required to provide a safe and healthy working environment, including proper safety equipment when needed and protection from hazardous substances.</p>
+                </div>
+                
+                <div class="compliance-item">
+                    <h4 class="font-bold">Privacy and Dignity Protection</h4>
+                    <p>The worker's privacy and dignity must be respected at all times, including private living quarters for live-in workers and protection from verbal, physical, or sexual abuse.</p>
+                </div>
+                
+                <div class="compliance-item">
+                    <h4 class="font-bold">Transparent Payment Practices</h4>
+                    <p>Wages must be paid in full and on time without unlawful deductions, through a transparent method (cash or bank transfer) as specified in the contract.</p>
+                </div>
+            </div>
+            
+            <div class="flex justify-end mt-6">
+                <button class="border border-borderGray text-darkText px-6 py-2 rounded-lg" onclick="closeModal('complianceModal')">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content p-6">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-success bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check-circle text-success text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Booking Submitted!</h3>
+                <p class="text-mutedText mb-6">Your long-term domestic help booking has been submitted successfully.</p>
+                
+                <div class="bg-lightGray rounded-lg p-4 mb-6 text-left">
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-mutedText">Booking ID:</span>
+                            <span class="font-medium">LT-2025-00156</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-mutedText">Job Type:</span>
+                            <span class="font-medium">Nanny / Child Care</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-mutedText">Agency:</span>
+                            <span class="font-medium">BrightHands Agency</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-mutedText">Status:</span>
+                            <span class="font-medium text-warning">Pending Assignment</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-mutedText">Processing Time:</span>
+                            <span class="font-medium">72 hours</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-center gap-3">
+                    <button class="border border-borderGray text-darkText px-6 py-2 rounded-lg" onclick="closeModal('confirmationModal')">
+                        Close
+                    </button>
+                    <button class="bg-primary text-white px-6 py-2 rounded-lg" onclick="viewBookingDetails()">
+                        View Booking Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate premium user for demonstration
+        const isPremiumUser = true; // Change to false to test restriction
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (isPremiumUser) {
+                document.getElementById('bookingForm').classList.remove('hidden');
+            }
+            
+            // Initialize signature pad
+            initSignaturePad();
+            
+            // Terms agreement listener
+            const termsCheckbox = document.getElementById('termsAgree');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            termsCheckbox.addEventListener('change', function() {
+                submitBtn.disabled = !this.checked;
+            });
+            
+            // Initial calculations
+            updateRoleFields();
+            calculateWorkload();
+            calculateSalary();
+            updateTimeline();
+        });
+
+        // Form navigation
+        let currentStep = 1;
+        const totalSteps = 5;
+
+        function nextStep(current) {
+            if (current < totalSteps) {
+                document.querySelector(`.step-content[data-step="${current}"]`).classList.remove('active');
+                document.querySelector(`.step-content[data-step="${current + 1}"]`).classList.add('active');
+                currentStep = current + 1;
+                updateProgress();
+                updateStepIndicator();
+            }
+        }
+
+        function prevStep(current) {
+            if (current > 1) {
+                document.querySelector(`.step-content[data-step="${current}"]`).classList.remove('active');
+                document.querySelector(`.step-content[data-step="${current - 1}"]`).classList.add('active');
+                currentStep = current - 1;
+                updateProgress();
+                updateStepIndicator();
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
+
+        function updateStepIndicator() {
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active', 'completed');
+                const stepNum = parseInt(step.getAttribute('data-step'));
+                if (stepNum < currentStep) {
+                    step.classList.add('completed');
+                } else if (stepNum === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+        }
+
+        // Toggle other task field
+        function toggleOtherTask() {
+            const otherTaskCheckbox = document.getElementById('otherTaskCheckbox');
+            const otherTask = document.getElementById('otherTask');
+            if (otherTaskCheckbox.checked) {
+                otherTask.style.display = 'block';
+            } else {
+                otherTask.style.display = 'none';
+            }
+            calculateWorkload();
+        }
+
+        // Update role-specific fields
+        function updateRoleFields() {
+            const role = document.getElementById('primaryRole').value;
+            const careNeeds = document.getElementById('careNeeds');
+            const nannyAdjustment = document.getElementById('nannyAdjustmentNotice');
+            
+            if (role === 'caregiver' || role === 'combined') {
+                careNeeds.style.display = 'block';
+            } else {
+                careNeeds.style.display = 'none';
+            }
+            
+            // Show nanny adjustment notice only for nanny role with mixed age groups
+            if (role === 'nanny') {
+                const children03 = parseInt(document.getElementById('children03').value) || 0;
+                const olderChildren = (parseInt(document.getElementById('children47').value) || 0) + 
+                                     (parseInt(document.getElementById('children814').value) || 0);
+                
+                if (children03 > 0 && olderChildren > 0) {
+                    nannyAdjustment.classList.remove('hidden');
+                } else {
+                    nannyAdjustment.classList.add('hidden');
+                }
+            } else {
+                nannyAdjustment.classList.add('hidden');
+            }
+            
+            calculateWorkload();
+        }
+
+        // Living arrangement selection
+        function selectLivingArrangement(type) {
+            document.getElementById('liveInRadio').checked = (type === 'live-in');
+            document.getElementById('liveOutRadio').checked = (type === 'live-out');
+            
+            if (type === 'live-in') {
+                document.getElementById('liveInFields').style.display = 'block';
+                document.getElementById('liveOutFields').style.display = 'none';
+            } else {
+                document.getElementById('liveInFields').style.display = 'none';
+                document.getElementById('liveOutFields').style.display = 'block';
+            }
+            
+            // Update summary
+            document.getElementById('summaryLiving').textContent = type === 'live-in' ? 'Live-in' : 'Live-out';
+            
+            calculateWorkload();
+            calculateSalary();
+        }
+
+        // Work cycle selection
+        function selectWorkCycle(cycle) {
+            document.getElementById('cycle61').checked = (cycle === '6+1');
+            document.getElementById('cycle132').checked = (cycle === '13+2');
+            document.getElementById('cycle264').checked = (cycle === '26+4');
+            
+            // Update summary
+            document.getElementById('summaryCycle').textContent = cycle;
+            
+            calculateWorkload();
+            calculateSalary();
+        }
+
+        // Toggle accommodation allowance field
+        function toggleAccommodationAllowance() {
+            const externalLodge = document.getElementById('externalLodge').value;
+            const allowanceField = document.getElementById('accommodationAllowanceField');
+            
+            if (externalLodge === 'Yes') {
+                allowanceField.style.display = 'block';
+            } else {
+                allowanceField.style.display = 'none';
+            }
+        }
+
+        // Worker tier selection
+        function selectWorkerTier(tier) {
+            // Remove selected class from all tier cards
+            document.querySelectorAll('.tier-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked card
+            event.currentTarget.classList.add('selected');
+            
+            // Update hidden input
+            document.getElementById('workerTier').value = tier;
+            
+            // Update summary
+            const tierNames = {
+                'entry': 'Entry Level',
+                'bronze': 'Bronze',
+                'silver': 'Silver',
+                'gold': 'Gold',
+                'platinum': 'Platinum',
+                'diamond': 'Diamond'
+            };
+            
+            document.getElementById('summaryTier').textContent = tierNames[tier];
+            
+            // Recalculate salary
+            calculateSalary();
+        }
+
+        // Fallback agency selection
+        function selectFallbackAgency(element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            element.classList.toggle('selected');
+        }
+
+        // Update timeline based on booking type
+        function updateTimeline() {
+            const instantBooking = document.getElementById('instantBooking').checked;
+            const futureBooking = document.getElementById('futureBooking').checked;
+            const crossBorderBooking = document.getElementById('crossBorderBooking').checked;
+            const startDate = document.getElementById('startDate').value;
+            const deadlineElement = document.getElementById('deadline');
+            
+            let deadline = new Date();
+            
+            if (instantBooking) {
+                deadline.setHours(deadline.getHours() + 72);
+                document.getElementById('summaryBookingType').textContent = 'Instant Booking';
+                document.getElementById('summaryProcessingTime').textContent = '72 hours';
+            } else if (futureBooking && startDate) {
+                deadline = new Date(startDate);
+                deadline.setHours(deadline.getHours() - 48);
+                document.getElementById('summaryBookingType').textContent = 'Future Date Booking';
+                document.getElementById('summaryProcessingTime').textContent = '48 hours';
+            } else if (crossBorderBooking) {
+                deadline.setDate(deadline.getDate() + 21);
+                document.getElementById('summaryBookingType').textContent = 'Cross-Border Recruitment';
+                document.getElementById('summaryProcessingTime').textContent = '21 days';
+            }
+            
+            // Format deadline
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            deadlineElement.textContent = deadline.toLocaleDateString('en-US', options);
+        }
+
+        // Calculate workload based on inputs
+        function calculateWorkload() {
+            const role = document.getElementById('primaryRole').value;
+            const adults = parseInt(document.getElementById('adults').value) || 0;
+            const children03 = parseInt(document.getElementById('children03').value) || 0;
+            const children47 = parseInt(document.getElementById('children47').value) || 0;
+            const children814 = parseInt(document.getElementById('children814').value) || 0;
+            const bedrooms = parseInt(document.getElementById('bedrooms').value) || 0;
+            const bathrooms = parseInt(document.getElementById('bathrooms').value) || 0;
+            const kitchens = parseInt(document.getElementById('kitchens').value) || 0;
+            const additionalRooms = parseInt(document.getElementById('additionalRooms').value) || 0;
+            const cooking = document.getElementById('cooking').checked;
+            const laundry = document.getElementById('laundry').checked;
+            const grocery = document.getElementById('grocery').checked;
+            const petCare = document.getElementById('petCare').checked;
+            const otherTask = document.getElementById('otherTaskCheckbox').checked;
+            const mobility = document.getElementById('mobility').checked;
+            const personalCare = document.getElementById('personalCare').checked;
+            const standbyHours = parseInt(document.getElementById('standbyHours').value) || 0;
+            const roomType = document.getElementById('roomType') ? document.getElementById('roomType').value : 'Private Room';
+            const mealPlan = document.getElementById('mealPlan') ? document.getElementById('mealPlan').value : '1-1-1';
+            const wifi = document.getElementById('wifi') ? document.getElementById('wifi').checked : false;
+            const ac = document.getElementById('ac') ? document.getElementById('ac').checked : false;
+            const tv = document.getElementById('tv') ? document.getElementById('tv').checked : false;
+            const laundryAmenity = document.getElementById('laundryAmenity') ? document.getElementById('laundryAmenity').checked : false;
+            const heater = document.getElementById('heater') ? document.getElementById('heater').checked : false;
+            const privateBathroom = document.getElementById('privateBathroom') ? document.getElementById('privateBathroom').checked : false;
+            
+            let baseHours = 0;
+            let adjustments = [];
+            
+            // Base hours by role
+            switch(role) {
+                case 'maid':
+                    baseHours = 8.0;
+                    adjustments.push({item: 'Base Role Hours', value: '8.0 hours'});
+                    break;
+                case 'nanny':
+                    // Check for mixed age group adjustment
+                    const olderChildren = children47 + children814;
+                    if (children03 > 0 && olderChildren > 0) {
+                        // Mixed age group - use younger child's hours
+                        baseHours = 10.5; // Average of 9-12 hours for 0-3 year olds
+                        adjustments.push({item: 'Mixed Age Group Adjustment', value: '10.5 hours (0-3 yrs basis)'});
+                    } else if (children03 > 0) {
+                        // Only young children
+                        baseHours = 10.5; // Average of 9-12
+                        adjustments.push({item: 'Base Role Hours', value: '10.5 hours (0-3 yrs)'});
+                    } else if (children47 > 0) {
+                        // Only middle children
+                        baseHours = 8.0; // Average of 7-9
+                        adjustments.push({item: 'Base Role Hours', value: '8.0 hours (4-7 yrs)'});
+                    } else if (children814 > 0) {
+                        // Only older children
+                        baseHours = 7.0; // Average of 6-8
+                        adjustments.push({item: 'Base Role Hours', value: '7.0 hours (8-14 yrs)'});
+                    } else {
+                        baseHours = 8.0;
+                        adjustments.push({item: 'Base Role Hours', value: '8.0 hours'});
+                    }
+                    break;
+                case 'caregiver':
+                    baseHours = 10.0; // Average of 8-12
+                    adjustments.push({item: 'Base Role Hours', value: '10.0 hours'});
+                    break;
+                case 'combined':
+                    // Combined role - start with maid hours and add others
+                    baseHours = 8.0;
+                    adjustments.push({item: 'Base Role Hours', value: '8.0 hours'});
+                    break;
+                default:
+                    baseHours = 8.0;
+                    adjustments.push({item: 'Base Role Hours', value: '8.0 hours'});
+            }
+            
+            // Adjustments
+            let totalAdjustment = 0;
+            
+            // Extra adults
+            if (adults > 2) { // Base is 2 adults
+                const extraAdults = adults - 2;
+                const adultAdjustment = extraAdults * 0.8; // +10% per extra adult
+                totalAdjustment += adultAdjustment;
+                adjustments.push({item: `+${extraAdults} Extra Adult(s)`, value: `+${adultAdjustment.toFixed(1)} hours`});
+            }
+            
+            // Children under care
+            const totalChildren = children03 + children47 + children814;
+            if (totalChildren > 0) {
+                const childAdjustment = totalChildren * 1.2; // +15% per child
+                totalAdjustment += childAdjustment;
+                adjustments.push({item: `+${totalChildren} Child(ren) under care`, value: `+${childAdjustment.toFixed(1)} hours`});
+            }
+            
+            // Extra rooms
+            const totalRooms = bedrooms + bathrooms + kitchens + additionalRooms;
+            const baseRooms = 6; // 3BR + 2BA + 1KT + 0 additional
+            if (totalRooms > baseRooms) {
+                const extraRooms = totalRooms - baseRooms;
+                const roomAdjustment = extraRooms * 0.6; // +10% per extra room
+                totalAdjustment += roomAdjustment;
+                adjustments.push({item: `+${extraRooms} Extra Room(s)`, value: `+${roomAdjustment.toFixed(1)} hours`});
+            }
+            
+            // Additional tasks
+            let taskAdjustment = 0;
+            if (cooking) taskAdjustment += 0.8;
+            if (laundry) taskAdjustment += 0.6;
+            if (grocery) taskAdjustment += 0.4;
+            if (petCare) taskAdjustment += 0.5;
+            if (otherTask) taskAdjustment += 0.7;
+            
+            if (taskAdjustment > 0) {
+                totalAdjustment += taskAdjustment;
+                adjustments.push({item: 'Additional Tasks', value: `+${taskAdjustment.toFixed(1)} hours`});
+            }
+            
+            // Care needs
+            if (mobility) {
+                totalAdjustment += 1.5; // +20-30%
+                adjustments.push({item: 'Mobility Assistance', value: '+1.5 hours'});
+            }
+            if (personalCare) {
+                totalAdjustment += 2.0; // +20-30%
+                adjustments.push({item: 'Personal/Private Care', value: '+2.0 hours'});
+            }
+            
+            // Standby hours (15% of standby time)
+            const standbyAdjustment = standbyHours * 0.15;
+            totalAdjustment += standbyAdjustment;
+            adjustments.push({item: `Standby Hours (${standbyHours} × 0.15)`, value: `+${standbyAdjustment.toFixed(2)} hours`});
+            
+            // Living arrangement adjustments
+            if (document.getElementById('liveInRadio') && document.getElementById('liveInRadio').checked) {
+                // Live-in specific adjustments
+                if (roomType === 'Shared Room') {
+                    adjustments.push({item: 'Shared Accommodation', value: '-0.5 hours (comfort factor)'});
+                    totalAdjustment -= 0.5;
+                } else if (roomType === 'Converted Space') {
+                    adjustments.push({item: 'Converted Space', value: '-1.0 hours (comfort factor)'});
+                    totalAdjustment -= 1.0;
+                }
+                
+                // Amenities adjustments
+                let amenitiesAdjustment = 0;
+                if (wifi) amenitiesAdjustment += 0.1;
+                if (ac) amenitiesAdjustment += 0.2;
+                if (tv) amenitiesAdjustment += 0.1;
+                if (laundryAmenity) amenitiesAdjustment += 0.1;
+                if (heater) amenitiesAdjustment += 0.1;
+                if (privateBathroom) amenitiesAdjustment += 0.3;
+                
+                if (amenitiesAdjustment > 0) {
+                    adjustments.push({item: 'Amenities Provided', value: `+${amenitiesAdjustment.toFixed(1)} hours (comfort factor)`});
+                    totalAdjustment += amenitiesAdjustment;
+                }
+            }
+            
+            // Calculate total daily workload
+            const dailyWorkload = baseHours + totalAdjustment;
+            
+            // Update UI
+            document.getElementById('dailyWorkload').textContent = `${dailyWorkload.toFixed(1)} hours`;
+            
+            // Update calculation breakdown
+            const breakdownContainer = document.getElementById('calculationBreakdown');
+            breakdownContainer.innerHTML = '';
+            adjustments.forEach(adjustment => {
+                const div = document.createElement('div');
+                div.className = 'adjustment-item';
+                div.innerHTML = `
+                    <span>${adjustment.item}</span>
+                    <span>${adjustment.value}</span>
+                `;
+                breakdownContainer.appendChild(div);
+            });
+            
+            // Update summary
+            document.getElementById('summaryRole').textContent = role === 'maid' ? 'Maid / Housekeeper' : 
+                role === 'nanny' ? 'Nanny / Child Care' : 
+                role === 'caregiver' ? 'Adult Caregiver' : 'Combined Role';
+            
+            document.getElementById('summaryHousehold').textContent = `${adults} Adult(s), ${children03 + children47 + children814} Child(ren)`;
+            document.getElementById('summaryHome').textContent = `${bedrooms} Bedrooms, ${bathrooms} Bathrooms`;
+            
+            const tasks = [];
+            if (cooking) tasks.push('Cooking');
+            if (laundry) tasks.push('Laundry');
+            if (grocery) tasks.push('Grocery');
+            if (petCare) tasks.push('Pet Care');
+            if (otherTask) tasks.push('Other');
+            document.getElementById('summaryTasks').textContent = tasks.length > 0 ? tasks.join(', ') : 'None';
+            
+            document.getElementById('summaryStandby').textContent = `${standbyHours} hours/day`;
+            
+            document.getElementById('summaryAccommodation').textContent = roomType;
+            
+            // Update salary calculation
+            calculateSalary();
+        }
+
+        // Calculate salary based on workload and tier
+        function calculateSalary() {
+            const dailyWorkload = parseFloat(document.getElementById('dailyWorkload').textContent) || 8.5;
+            const workerTier = document.getElementById('workerTier').value;
+            const role = document.getElementById('primaryRole').value;
+            const children03 = parseInt(document.getElementById('children03').value) || 0;
+            const olderChildren = (parseInt(document.getElementById('children47').value) || 0) + 
+                                 (parseInt(document.getElementById('children814').value) || 0);
+            const paymentCycle = document.getElementById('paymentCycle') ? document.getElementById('paymentCycle').value : 'Monthly';
+            
+            // Tier 1 reference rate
+            const tier1Monthly = 8000; // EGP 8,000
+            const workDays = 26;
+            const tier1Hourly = tier1Monthly / (workDays * 8); // ~EGP 38.46/hour
+            
+            // Tier multipliers based on worker achievements
+            let minMultiplier, maxMultiplier, minMonthly;
+            switch(workerTier) {
+                case 'entry':
+                    minMultiplier = 1.0;
+                    maxMultiplier = 1.0;
+                    minMonthly = tier1Monthly;
+                    break;
+                case 'bronze':
+                    minMultiplier = 1.10;
+                    maxMultiplier = 1.20;
+                    minMonthly = tier1Monthly * 1.10; // EGP 8,800
+                    break;
+                case 'silver':
+                    minMultiplier = 1.15;
+                    maxMultiplier = 1.30;
+                    minMonthly = tier1Monthly * 1.15; // EGP 9,200
+                    break;
+                case 'gold':
+                    minMultiplier = 1.25;
+                    maxMultiplier = 1.40;
+                    minMonthly = tier1Monthly * 1.25; // EGP 10,000
+                    break;
+                case 'platinum':
+                    minMultiplier = 1.35;
+                    maxMultiplier = 1.60;
+                    minMonthly = tier1Monthly * 1.35; // EGP 10,800
+                    break;
+                case 'diamond':
+                    minMultiplier = 1.45;
+                    maxMultiplier = 1.70;
+                    minMonthly = tier1Monthly * 1.45; // EGP 11,600
+                    break;
+                default:
+                    minMultiplier = 1.0;
+                    maxMultiplier = 1.0;
+                    minMonthly = tier1Monthly;
+            }
+            
+            // Calculate base hourly rates
+            const minHourlyRate = tier1Hourly * minMultiplier;
+            const maxHourlyRate = tier1Hourly * maxMultiplier;
+            
+            // Apply nanny-specific adjustments for mixed age groups
+            let finalMinHourlyRate = minHourlyRate;
+            let finalMaxHourlyRate = maxHourlyRate;
+            
+            if (role === 'nanny' && children03 > 0 && olderChildren > 0) {
+                // Nanny mixed age group adjustment: +0.25% per additional child beyond first
+                const totalChildren = children03 + children47 + children814;
+                if (totalChildren > 1) {
+                    const additionalChildren = totalChildren - 1;
+                    const adjustmentFactor = 1 + (0.0025 * additionalChildren); // +0.25% per additional child
+                    
+                    finalMinHourlyRate = minHourlyRate * adjustmentFactor;
+                    finalMaxHourlyRate = maxHourlyRate * adjustmentFactor;
+                    
+                    // Update calculation breakdown to show this adjustment
+                    const breakdownContainer = document.getElementById('calculationBreakdown');
+                    const adjustmentDiv = document.createElement('div');
+                    adjustmentDiv.className = 'adjustment-item';
+                    adjustmentDiv.innerHTML = `
+                        <span>Nanny Mixed Age Adjustment</span>
+                        <span>+${(0.25 * additionalChildren).toFixed(2)}%</span>
+                    `;
+                    // Insert after the last item
+                    if (breakdownContainer.lastChild) {
+                        breakdownContainer.insertBefore(adjustmentDiv, breakdownContainer.lastChild.nextSibling);
+                    } else {
+                        breakdownContainer.appendChild(adjustmentDiv);
+                    }
+                }
+            }
+            
+            // Calculate monthly salaries
+            const minMonthlySalary = dailyWorkload * finalMinHourlyRate * workDays;
+            // Add 25% to the minimum monthly to get the upper range
+            const maxMonthlySalary = minMonthlySalary * 1.25;
+            
+            // Update UI
+            document.getElementById('hourlyRate').textContent = `EGP ${finalMinHourlyRate.toFixed(2)} - EGP ${finalMaxHourlyRate.toFixed(2)}`;
+            document.getElementById('monthlySalary').textContent = `EGP ${Math.round(minMonthlySalary)} – EGP ${Math.round(maxMonthlySalary)}`;
+            
+            // Update summary
+            document.getElementById('summaryWorkload').textContent = `${dailyWorkload.toFixed(1)} hours/day`;
+            document.getElementById('summarySalary').textContent = `EGP ${Math.round(minMonthlySalary)} – EGP ${Math.round(maxMonthlySalary)}`;
+            
+            document.getElementById('summaryPayment').textContent = paymentCycle;
+        }
+
+        // Signature pad functionality
+        function initSignaturePad() {
+            const canvas = document.getElementById('signatureCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // Set drawing styles
+            ctx.strokeStyle = '#2C3E73';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
+            
+            // Mouse events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Touch events for mobile
+            canvas.addEventListener('touchstart', handleTouchStart);
+            canvas.addEventListener('touchmove', handleTouchMove);
+            canvas.addEventListener('touchend', stopDrawing);
+            
+            function startDrawing(e) {
+                isDrawing = true;
+                [lastX, lastY] = getPosition(e);
+            }
+            
+            function draw(e) {
+                if (!isDrawing) return;
+                const [x, y] = getPosition(e);
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                [lastX, lastY] = [x, y];
+            }
+            
+            function stopDrawing() {
+                isDrawing = false;
+            }
+            
+            function getPosition(e) {
+                let x, y;
+                if (e.type.includes('touch')) {
+                    const touch = e.touches[0] || e.changedTouches[0];
+                    const rect = canvas.getBoundingClientRect();
+                    x = touch.clientX - rect.left;
+                    y = touch.clientY - rect.top;
+                } else {
+                    x = e.offsetX;
+                    y = e.offsetY;
+                }
+                return [x, y];
+            }
+            
+            function handleTouchStart(e) {
+                e.preventDefault();
+                startDrawing(e.touches[0]);
+            }
+            
+            function handleTouchMove(e) {
+                e.preventDefault();
+                draw(e.touches[0]);
+            }
+            
+            // Make global functions available
+            window.clearSignature = function() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            };
+            
+            window.saveSignature = function() {
+                alert('Signature saved successfully!');
+            };
+        }
+
+        // Form submission
+        function submitBooking() {
+            openModal('signatureModal');
+        }
+
+        function finalizeBooking() {
+            const canvas = document.getElementById('signatureCanvas');
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            let isEmpty = true;
+            
+            // Check if canvas is empty
+            for (let i = 0; i < imageData.data.length; i += 4) {
+                if (imageData.data[i + 3] !== 0) {
+                    isEmpty = false;
+                    break;
+                }
+            }
+            
+            if (isEmpty) {
+                alert('Please provide your signature before submitting.');
+                return;
+            }
+            
+            closeModal('signatureModal');
+            openModal('confirmationModal');
+        }
+
+        function viewBookingDetails() {
+            alert('Redirecting to booking details page...');
+            closeModal('confirmationModal');
+            // In a real app, you would navigate to the booking details page
+            window.location.href = '#'; // Placeholder for actual navigation
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+```
