@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -69,8 +69,9 @@ interface ContractForm {
   endDate: string
 }
 
-export default function CreateContractPage() {
+function CreateContractPageContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [familyRequests, setFamilyRequests] = useState<FamilyRequest[]>([])
   const [affiliatedWorkers, setAffiliatedWorkers] = useState<AffiliatedWorker[]>([])
   const [selectedFamily, setSelectedFamily] = useState<FamilyRequest | null>(null)
@@ -78,6 +79,7 @@ export default function CreateContractPage() {
   const [showFamilySelection, setShowFamilySelection] = useState(false)
   const [showWorkerSelection, setShowWorkerSelection] = useState(false)
   const [showSuccessPopup, setShowSuccessPopup] = useState(false)
+  const [isPreFilled, setIsPreFilled] = useState(false)
   const [contractForm, setContractForm] = useState<ContractForm>({
     familyId: null,
     workerId: null,
@@ -156,6 +158,37 @@ export default function CreateContractPage() {
     setAffiliatedWorkers(mockAffiliatedWorkers)
   }, [])
 
+  useEffect(() => {
+    // Check for URL parameters to pre-fill the form AFTER mock data is loaded
+    const familyId = searchParams.get('familyId')
+    const workerId = searchParams.get('workerId')
+    
+    if (familyId && workerId && familyRequests.length > 0 && affiliatedWorkers.length > 0) {
+      // Pre-fill the form with data from ongoing request
+      const family = familyRequests.find(f => f.id === parseInt(familyId))
+      const worker = affiliatedWorkers.find(w => w.id === parseInt(workerId))
+      
+      if (family && worker) {
+        setSelectedFamily(family)
+        setSelectedWorker(worker)
+        setContractForm(prev => ({
+          ...prev,
+          familyId: family.id,
+          workerId: worker.id,
+          position: family.jobTitle,
+          location: family.location,
+          startDate: family.startDate,
+          monthlySalary: family.budget
+        }))
+        
+        // Hide the selection modals since we have pre-selected data
+        setShowFamilySelection(false)
+        setShowWorkerSelection(false)
+        setIsPreFilled(true)
+      }
+    }
+  }, [searchParams, familyRequests, affiliatedWorkers])
+
   const handleFamilySelection = (family: FamilyRequest) => {
     setSelectedFamily(family)
     setContractForm(prev => ({ 
@@ -202,7 +235,7 @@ export default function CreateContractPage() {
     // Auto-hide popup after 5 seconds
     setTimeout(() => {
       setShowSuccessPopup(false)
-      router.push('/agency/contracts')
+              router.push('/contracts')
     }, 5000)
   }
 
@@ -215,6 +248,22 @@ export default function CreateContractPage() {
           subtitle="Generate employment agreement between family and worker" 
           showBackButton={true}
         />
+
+        {/* Success Message for Pre-filled Form */}
+        {isPreFilled && selectedFamily && selectedWorker && (
+          <Card className="border-green-200 bg-green-50 mb-6">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 text-green-800">
+                <CheckCircle className="h-5 w-5" />
+                <p className="font-medium">Form Pre-filled Successfully!</p>
+              </div>
+              <p className="text-sm text-green-700 mt-1">
+                Contract details for <strong>{selectedFamily.familyName}</strong> and <strong>{selectedWorker.name}</strong> have been automatically filled. 
+                You can now complete the remaining contract details.
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Contract Header */}
         <Card>
@@ -684,7 +733,7 @@ export default function CreateContractPage() {
               <Button 
                 onClick={() => {
                   setShowSuccessPopup(false)
-                  router.push('/agency/contracts')
+                  router.push('/contracts')
                 }}
                 className="mt-6 w-full"
               >
@@ -695,5 +744,22 @@ export default function CreateContractPage() {
         )}
       </div>
     </DashboardLayout>
+  )
+}
+
+export default function CreateContractPage() {
+  return (
+    <Suspense fallback={
+      <DashboardLayout userRole="agency" userName="Elite Home Services" userEmail="admin@elitehomeservices.com">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading contract creation...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    }>
+      <CreateContractPageContent />
+    </Suspense>
   )
 }

@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Home, Briefcase, Users, MessageSquare, Settings, Bell, Menu, LogOut, User, Plus, Search } from "lucide-react"
+import { Home, Briefcase, Users, Bell, Menu, LogOut, User, Plus, Search } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { UserRole } from "@/lib/types"
 
@@ -34,14 +34,13 @@ interface NavItem {
   href: string
   icon: React.ComponentType<{ className?: string }>
   badge?: string
+  onClick?: () => void
 }
 
 const getNavigationItems = (role: UserRole): NavItem[] => {
   const baseItems: NavItem[] = [
     { title: "Dashboard", href: `/${role}/dashboard`, icon: Home },
-    { title: "Messages", href: `/${role}/messages`, icon: MessageSquare },
     { title: "Profile", href: `/${role}/profile`, icon: User },
-    { title: "Settings", href: `/${role}/settings`, icon: Settings },
   ]
 
   switch (role) {
@@ -65,9 +64,14 @@ const getNavigationItems = (role: UserRole): NavItem[] => {
       return [
         ...baseItems.slice(0, 1),
         { title: "Workers", href: "/agency/workers", icon: Users },
-        { title: "Jobs", href: "/agency/jobs", icon: Briefcase },
-        { title: "Applications", href: "/agency/applications", icon: Briefcase },
         ...baseItems.slice(1),
+        { title: "Logout", href: "#", icon: LogOut, onClick: () => handleSignOut() },
+      ]
+    case "admin":
+      return [
+        ...baseItems.slice(0, 1),
+        { title: "Profile", href: "/admin/profile", icon: User },
+        { title: "Logout", href: "#", icon: LogOut, onClick: () => handleSignOut() },
       ]
     default:
       return baseItems
@@ -81,10 +85,17 @@ export function DashboardLayout({ children, userRole, userName, userEmail, userA
 
   const handleSignOut = async () => {
     try {
-      await fetch("/api/auth/signout", { method: "POST" })
+      // Clear any stored user data
+      localStorage.removeItem('user')
+      localStorage.removeItem('userRole')
+      localStorage.removeItem('token')
+      
+      // Redirect to home page
       window.location.href = "/"
     } catch (error) {
       console.error("Sign out error:", error)
+      // Fallback redirect
+      window.location.href = "/"
     }
   }
 
@@ -92,6 +103,35 @@ export function DashboardLayout({ children, userRole, userName, userEmail, userA
     <nav className={cn("space-y-2", className)}>
       {navigationItems.map((item) => {
         const isActive = pathname === item.href
+        const isLogout = item.title === "Logout"
+        
+        if (item.onClick) {
+          return (
+            <Button
+              key={item.href}
+              variant="ghost"
+              className={cn(
+                "w-full justify-start gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+                isLogout 
+                  ? "text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-200 border border-transparent" 
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+              onClick={() => {
+                item.onClick?.()
+                setIsMobileMenuOpen(false)
+              }}
+            >
+              <item.icon className={cn("h-4 w-4", isLogout && "text-red-600")} />
+              {item.title}
+              {item.badge && (
+                <Badge variant="secondary" className="ml-auto">
+                  {item.badge}
+                </Badge>
+              )}
+            </Button>
+          )
+        }
+        
         return (
           <Link
             key={item.href}
@@ -177,14 +217,12 @@ export function DashboardLayout({ children, userRole, userName, userEmail, userA
                   Profile
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href={`/${userRole}/settings`}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </Link>
-              </DropdownMenuItem>
+
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut}>
+              <DropdownMenuItem 
+                onClick={handleSignOut}
+                className="text-red-600 hover:bg-red-50 hover:text-red-700 focus:bg-red-50 focus:text-red-700"
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 Sign out
               </DropdownMenuItem>

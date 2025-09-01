@@ -21,12 +21,12 @@ import {
   Eye,
   Star,
 } from "lucide-react"
-import { ShortTermJobModal } from "@/components/jobs/short-term-job-modal"
+
 
 export default function EmployerDashboard() {
   const [activeTab, setActiveTab] = useState("overview")
   const [applicationFilter, setApplicationFilter] = useState("all")
-  const [shortTermModalOpen, setShortTermModalOpen] = useState(false)
+
   const router = useRouter()
 
   const shortTermApplications = [
@@ -566,7 +566,7 @@ export default function EmployerDashboard() {
         </div>
       </div>
 
-      <ShortTermJobModal open={shortTermModalOpen} onOpenChange={setShortTermModalOpen} />
+
     </div>
   )
 }

@@ -28,9 +28,15 @@ export function ThemeProvider({
   storageKey = "jobza-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage?.getItem(storageKey) as Theme) || defaultTheme
-  )
+  const [theme, setTheme] = useState<Theme>(defaultTheme)
+
+  useEffect(() => {
+    // Only access localStorage on the client side
+    const savedTheme = localStorage?.getItem(storageKey) as Theme
+    if (savedTheme) {
+      setTheme(savedTheme)
+    }
+  }, [storageKey])
 
   useEffect(() => {
     const root = window.document.documentElement
@@ -53,7 +59,10 @@ export function ThemeProvider({
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      localStorage?.setItem(storageKey, theme)
+      // Only access localStorage on the client side
+      if (typeof window !== 'undefined') {
+        localStorage?.setItem(storageKey, theme)
+      }
       setTheme(theme)
     },
   }

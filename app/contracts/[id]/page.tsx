@@ -20,6 +20,7 @@ import {
   Printer,
   Building2,
   User,
+  XCircle,
 } from "lucide-react"
 import { WorkerSidebar } from "@/components/layout/worker-sidebar"
 import { EmployerSidebar } from "@/components/layout/employer-sidebar"
@@ -86,23 +87,26 @@ const contractData = {
 }
 
 // Get user role from query parameter
-const getUserRole = (searchParams: URLSearchParams): "worker" | "employer" | "agency" => {
-  const role = searchParams.get('role')
+const getUserRole = (searchParams: URLSearchParams): "worker" | "employer" | "agency" | "admin" => {
+  const role = searchParams.get('userRole')
   if (role === 'employer') return "employer"
   if (role === 'agency') return "agency"
+  if (role === 'admin') return "admin"
   return "worker" // default
 }
 
 // Check if user role is agency (uses different layout)
-const isAgency = (userRole: "worker" | "employer" | "agency") => userRole === "agency"
+const isAgency = (userRole: "worker" | "employer" | "agency" | "admin") => userRole === "agency"
 
 // Get appropriate back navigation based on user role
-const getBackNavigation = (userRole: "worker" | "employer" | "agency", router: any) => {
+const getBackNavigation = (userRole: "worker" | "employer" | "agency" | "admin", router: any) => {
   switch (userRole) {
     case "employer":
       return () => router.push("/employer/dashboard")
     case "agency":
       return () => router.push("/agency/dashboard")
+    case "admin":
+      return () => router.push("/admin/dashboard")
     default:
       return () => router.push("/worker/dashboard")
   }
@@ -448,10 +452,10 @@ export default function ContractPage({ params }: { params: { id: string } }) {
     )
   }
 
-  // If agency user, wrap with DashboardLayout
-  if (isAgencyUser) {
+  // If agency or admin user, wrap with DashboardLayout
+  if (isAgencyUser || userRole === "admin") {
     return (
-      <DashboardLayout userRole="agency">
+              <DashboardLayout userRole={userRole === "admin" ? "admin" : "agency"}>
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center mb-6">
@@ -493,6 +497,20 @@ export default function ContractPage({ params }: { params: { id: string } }) {
                   </Badge>
                 </div>
               </div>
+              
+              {/* Admin Controls */}
+              {userRole === "admin" && (
+                <div className="flex gap-2 mt-4">
+                  <Button variant="default" className="bg-green-600 hover:bg-green-700">
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Approve Contract
+                  </Button>
+                  <Button variant="destructive">
+                    <XCircle className="h-4 w-4 mr-2" />
+                    Reject Contract
+                  </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -896,3 +914,4 @@ export default function ContractPage({ params }: { params: { id: string } }) {
     </div>
   )
 }
+

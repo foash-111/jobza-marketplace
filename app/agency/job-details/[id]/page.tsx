@@ -1,12 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { 
   Users, 
   MapPin, 
@@ -61,14 +62,29 @@ interface AffiliatedWorker {
   matchScore: number
 }
 
+interface AssignedWorker {
+  id: number
+  name: string
+  specialization: string
+  rating: number
+  experience: number
+  status: 'pending' | 'short_list' | 'rejected' | 'accepted'
+  assignedDate: string
+  employerFeedback?: string
+}
+
 export default function JobDetailsPage() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [jobRequest, setJobRequest] = useState<JobRequest | null>(null)
   const [affiliatedWorkers, setAffiliatedWorkers] = useState<AffiliatedWorker[]>([])
+  const [assignedWorkers, setAssignedWorkers] = useState<AssignedWorker[]>([])
   const [showWorkerAssignment, setShowWorkerAssignment] = useState(false)
   const [selectedWorkers, setSelectedWorkers] = useState<number[]>([])
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'pending')
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
 
   useEffect(() => {
     // Mock data - in real app, fetch from API using params.id
@@ -141,8 +157,33 @@ export default function JobDetailsPage() {
       }
     ]
 
+    // Mock assigned workers data for ongoing requests
+    const mockAssignedWorkers: AssignedWorker[] = [
+      {
+        id: 1,
+        name: "Maria Garcia",
+        specialization: "Housekeeping",
+        rating: 4.7,
+        experience: 6,
+        status: 'accepted',
+        assignedDate: '2024-01-25',
+        employerFeedback: 'Excellent candidate, very professional'
+      },
+      {
+        id: 2,
+        name: "Fatima Al-Zahra",
+        specialization: "Housekeeping",
+        rating: 4.9,
+        experience: 8,
+        status: 'short_list',
+        assignedDate: '2024-01-26',
+        employerFeedback: 'Good candidate, considering for backup'
+      }
+    ]
+
     setJobRequest(mockJobRequest)
     setAffiliatedWorkers(mockAffiliatedWorkers)
+    setAssignedWorkers(mockAssignedWorkers)
     setLoading(false)
   }, [params.id])
 
@@ -157,8 +198,29 @@ export default function JobDetailsPage() {
   const handleAssignWorkers = () => {
     // In real app, this would send the assignment to the backend
     console.log("Assigning workers:", selectedWorkers)
+    
+    // Add assigned workers to the assignedWorkers state
+    const newlyAssignedWorkers = affiliatedWorkers.filter(worker => 
+      selectedWorkers.includes(worker.id)
+    ).map(worker => ({
+      ...worker,
+      status: 'pending' as const,
+      assignedDate: new Date().toISOString().split('T')[0]
+    }))
+    
+    setAssignedWorkers(prev => [...prev, ...newlyAssignedWorkers])
+    
+    // Show success message and switch to ongoing tab
     setShowWorkerAssignment(false)
     setSelectedWorkers([])
+    setShowSuccessMessage(true)
+    setActiveTab('ongoing')
+    
+    // Hide success message after 3 seconds
+    setTimeout(() => setShowSuccessMessage(false), 3000)
+    
+    // In a real app, you would also update the backend and move the request to ongoing status
+    // This would trigger the moveToOngoing function in the dashboard
   }
 
   if (loading) {
@@ -196,7 +258,19 @@ export default function JobDetailsPage() {
           subtitle={`${jobRequest.familyName} - ${jobRequest.jobTitle}`} 
         />
 
-        {/* Job Overview */}
+        {/* Tab Navigation */}
+        <Card>
+          <CardContent className="p-0">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="pending">Job Details</TabsTrigger>
+                <TabsTrigger value="ongoing">Assigned Workers</TabsTrigger>
+              </TabsList>
+
+              {/* Job Details Tab */}
+              <TabsContent value="pending" className="p-6">
+                <div className="space-y-6">
+                  {/* Job Overview */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -321,28 +395,148 @@ export default function JobDetailsPage() {
           </CardContent>
         </Card>
 
-        {/* Worker Assignment Section */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Assign Workers</CardTitle>
-                <CardDescription>Select from your affiliated workers to assign to this job</CardDescription>
-              </div>
-              <Button onClick={() => setShowWorkerAssignment(true)}>
-                <UserPlus className="h-4 w-4 mr-2" />
-                Assign Workers
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-muted-foreground">
-              <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-              <p>No workers assigned yet</p>
-              <p className="text-sm">Click "Assign Workers" to select from your affiliated workers</p>
-            </div>
+                  {/* Assign Workers Section - Only for Pending Requests */}
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle>Assign Workers</CardTitle>
+                          <CardDescription>Select from your affiliated workers to assign to this job</CardDescription>
+                        </div>
+                        <Button onClick={() => setShowWorkerAssignment(true)}>
+                          <UserPlus className="h-4 w-4 mr-2" />
+                          Assign Workers
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-center py-8 text-muted-foreground">
+                        <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                        <p>No workers assigned yet</p>
+                        <p className="text-sm">Click "Assign Workers" to select from your affiliated workers</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              {/* Assigned Workers Tab */}
+              <TabsContent value="ongoing" className="p-6">
+                <div className="space-y-6">
+                  {/* Success Message */}
+                  {showSuccessMessage && (
+                    <Card className="border-green-200 bg-green-50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-2 text-green-800">
+                          <CheckCircle className="h-5 w-5" />
+                          <p className="font-medium">Workers assigned successfully!</p>
+                        </div>
+                        <p className="text-sm text-green-700 mt-1">
+                          The request has moved to ongoing status. You can now track worker acceptance from employers.
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
+                  
+                  {/* Assigned Workers Overview */}
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle>Assigned Workers</CardTitle>
+                          <CardDescription>Track the status of workers assigned to this job</CardDescription>
+                        </div>
+                        <Button onClick={() => setShowWorkerAssignment(true)}>
+                          <UserPlus className="h-4 w-4 mr-2" />
+                          Assign More Workers
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      {assignedWorkers.length > 0 ? (
+                        <div className="space-y-4">
+                          {assignedWorkers.map((worker) => (
+                            <div key={worker.id} className="flex items-center justify-between p-4 border rounded-lg bg-card">
+                              <div className="flex items-center gap-4">
+                                <Avatar>
+                                  <AvatarImage src="/placeholder.svg" alt={worker.name} />
+                                  <AvatarFallback>{worker.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="font-medium text-card-foreground">{worker.name}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {worker.specialization} • ⭐ {worker.rating} • {worker.experience} years experience
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Assigned: {worker.assignedDate}
+                                  </p>
+                                  {worker.employerFeedback && (
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      Feedback: "{worker.employerFeedback}"
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center gap-3">
+                                <Badge 
+                                  variant={
+                                    worker.status === 'accepted' ? 'default' : 
+                                    worker.status === 'short_list' ? 'secondary' : 
+                                    worker.status === 'rejected' ? 'destructive' : 'outline'
+                                  }
+                                  className="text-sm"
+                                >
+                                  {worker.status === 'accepted' ? '✅ Accepted' :
+                                   worker.status === 'short_list' ? '📋 Short List' :
+                                   worker.status === 'rejected' ? '❌ Rejected' : '⏳ Pending'}
+                                </Badge>
+                                
+                                {worker.status === 'accepted' && (
+                                  <Button 
+                                    size="sm" 
+                                    onClick={() => router.push(`/contracts/create?familyId=${jobRequest.id}&workerId=${worker.id}`)}
+                                  >
+                                    Proceed with Contract
+                                  </Button>
+                                )}
+                                
+                                {/* Demo: Update Status (remove in production) */}
+                                {worker.status !== 'accepted' && (
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => {
+                                      const newStatus = worker.status === 'pending' ? 'short_list' : 
+                                                     worker.status === 'short_list' ? 'accepted' : 'pending'
+                                      setAssignedWorkers(prev => prev.map(w => 
+                                        w.id === worker.id ? { ...w, status: newStatus } : w
+                                      ))
+                                    }}
+                                  >
+                                    Update Status
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                          <p>No workers assigned yet</p>
+                          <p className="text-sm">Click "Assign More Workers" to select from your affiliated workers</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
+
+
 
         {/* Worker Assignment Modal */}
         {showWorkerAssignment && (

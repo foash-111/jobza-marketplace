@@ -1,14 +1,16 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog"
 import {
   Shield,
   MessageSquare,
@@ -26,6 +28,7 @@ import {
   GraduationCap,
   AlertCircle,
   RefreshCw,
+  XCircle,
 } from "lucide-react"
 import { WorkerSidebar } from "@/components/layout/worker-sidebar"
 import Link from "next/link"
@@ -51,11 +54,18 @@ interface DocumentStatus {
   rejectionReason?: string
 }
 
-export default function WorkerProfile() {
+function WorkerProfileContent() {
+  const searchParams = useSearchParams()
+  const isAdmin = searchParams?.get('admin') === 'true'
   const [isEditing, setIsEditing] = useState(false)
   const [isEditingSkills, setIsEditingSkills] = useState(false)
   const [isEditingDocuments, setIsEditingDocuments] = useState(false)
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null)
+  
+  // Admin rejection dialog state
+  const [showRejectionDialog, setShowRejectionDialog] = useState(false)
+  const [rejectingDocument, setRejectingDocument] = useState<string | null>(null)
+  const [rejectionReason, setRejectionReason] = useState("")
   const [availableSkills] = useState([
     "House Cleaning",
     "Deep Cleaning",
@@ -73,6 +83,44 @@ export default function WorkerProfile() {
   ])
   const signatureRef = useRef<HTMLCanvasElement>(null)
   const [hasSignature, setHasSignature] = useState(false)
+
+  // Admin functions
+  const handleApproveDocument = (documentKey: string) => {
+    setDocuments(prev => ({
+      ...prev,
+      [documentKey]: { ...prev[documentKey], status: "approved" as const }
+    }))
+  }
+
+  const handleRejectDocument = (documentKey: string, reason: string) => {
+    setDocuments(prev => ({
+      ...prev,
+      [documentKey]: { 
+        ...prev[documentKey], 
+        status: "rejected" as const,
+        rejectionReason: reason
+      }
+    }))
+  }
+
+  const openRejectionDialog = (documentKey: string) => {
+    setRejectingDocument(documentKey)
+    setRejectionReason("")
+    setShowRejectionDialog(true)
+  }
+
+  const submitRejection = () => {
+    if (rejectingDocument && rejectionReason.trim()) {
+      handleRejectDocument(rejectingDocument, rejectionReason.trim())
+      setShowRejectionDialog(false)
+      setRejectingDocument(null)
+      setRejectionReason("")
+    }
+  }
+
+  const handleApproveWorker = () => {
+    setWorkerData(prev => ({ ...prev, approved: "Approved" }))
+  }
 
   const [documents, setDocuments] = useState<Record<string, DocumentStatus>>({
     visa: { file: null, status: "pending" },
@@ -259,6 +307,18 @@ export default function WorkerProfile() {
                     </div>
 
                     <div className="flex gap-2">
+                      {isAdmin && workerData.approved === "Pending" && (
+                        <Button
+                          variant="default"
+                          onClick={handleApproveWorker}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Approve Worker
+                        </Button>
+                      )}
+                      {!isAdmin && (
+                        <>
                       {isEditing ? (
                         <>
                           <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
@@ -275,6 +335,8 @@ export default function WorkerProfile() {
                           <Edit className="w-4 h-4 mr-2" />
                           Edit Profile
                         </Button>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
@@ -448,10 +510,12 @@ export default function WorkerProfile() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-blue-900">Skills & Services</CardTitle>
+                    {!isAdmin && (
                     <Button onClick={() => setIsEditingSkills(!isEditingSkills)} variant="outline" size="sm">
-                      <Edit className="w-4 h-4 mr-2" />
+                        <Edit className="w-4 w-4 mr-2" />
                       {isEditingSkills ? "Done" : "Edit"}
                     </Button>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -511,10 +575,12 @@ export default function WorkerProfile() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-blue-900">Required Documents</CardTitle>
+                    {!isAdmin && (
                     <Button onClick={() => setIsEditingDocuments(!isEditingDocuments)} variant="outline" size="sm">
                       <Edit className="w-4 h-4 mr-2" />
                       {isEditingDocuments ? "Done" : "Edit"}
                     </Button>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -537,26 +603,7 @@ export default function WorkerProfile() {
                                 className={getPhotoContainerStyle()}
                                 style={{ objectFit: 'contain', maxHeight: '100%', maxWidth: '100%' }}
                               />
-                              {isEditingDocuments && (
-                                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                                  <Input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0]
-                                      if (file) handlePhotoCrop("facePhoto", file)
-                                    }}
-                                    className="hidden"
-                                    id="facePhotoUpdate"
-                                  />
-                                  <label htmlFor="facePhotoUpdate">
-                                    <Button variant="secondary" size="sm">
-                                      <RefreshCw className="w-4 h-4 mr-2" />
-                                      Update
-                                    </Button>
-                                  </label>
-                                </div>
-                              )}
+
                             </div>
                           ) : (
                             <div className="h-48 flex items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
@@ -573,8 +620,44 @@ export default function WorkerProfile() {
                             <span className="text-sm text-red-700">{documents.facePhoto.rejectionReason}</span>
                           </div>
                         )}
+                        
+                                                {/* Admin Controls */}
+                        {isAdmin && (
+                          <div className="flex gap-2 mt-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => handleApproveDocument("facePhoto")}
+                              className="text-green-600 border-green-600 hover:bg-green-50"
+                              disabled={documents.facePhoto.status === "approved"}
+                            >
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              Approve
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="destructive"
+                              onClick={() => openRejectionDialog("facePhoto")}
+                              disabled={documents.facePhoto.status === "rejected"}
+                            >
+                              <XCircle className="h-3 w-3 mr-1" />
+                              Reject
+                            </Button>
+                          </div>
+                        )}
+                        
+                        {/* Rejection Reason Display */}
+                        {documents.facePhoto.status === "rejected" && documents.facePhoto.rejectionReason && (
+                          <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg mt-3">
+                            <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-red-700">
+                              {documents.facePhoto.rejectionReason}
+                            </span>
+                          </div>
+                        )}
+                        
                         {/* Upload button for missing documents */}
-                        {!documents.facePhoto.file && (
+                        {!isAdmin && !documents.facePhoto.file && (
                           <div className="flex gap-2">
                             <Input
                               type="file"
@@ -597,7 +680,7 @@ export default function WorkerProfile() {
                           </div>
                         )}
                         {/* Update button when editing */}
-                        {isEditingDocuments && documents.facePhoto.file && (
+                        {!isAdmin && isEditingDocuments && documents.facePhoto.file && (
                           <div className="flex gap-2">
                             <Input
                               type="file"
@@ -637,26 +720,7 @@ export default function WorkerProfile() {
                                 className={getPhotoContainerStyle()}
                                 style={{ objectFit: 'contain', maxHeight: '100%', maxWidth: '100%' }}
                               />
-                              {isEditingDocuments && (
-                                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                                  <Input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0]
-                                      if (file) handlePhotoCrop("fullBodyPhoto", file)
-                                    }}
-                                    className="hidden"
-                                    id="fullBodyPhotoUpdate"
-                                  />
-                                  <label htmlFor="fullBodyPhotoUpdate">
-                                    <Button variant="secondary" size="sm">
-                                      <RefreshCw className="w-4 h-4 mr-2" />
-                                      Update
-                                    </Button>
-                                  </label>
-                                </div>
-                              )}
+
                             </div>
                           ) : (
                             <div className="h-64 flex items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
@@ -673,8 +737,44 @@ export default function WorkerProfile() {
                             <span className="text-sm">Full Body Photo uploaded successfully</span>
                           </div>
                         )}
+                        
+                        {/* Rejection Reason Display */}
+                        {documents.fullBodyPhoto.status === "rejected" && documents.fullBodyPhoto.rejectionReason && (
+                          <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg mt-3">
+                            <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-red-700">
+                              {documents.fullBodyPhoto.rejectionReason}
+                            </span>
+                          </div>
+                        )}
+                        
+                        {/* Admin Controls */}
+                        {isAdmin && (
+                          <div className="flex gap-2 mt-2 justify-center">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => handleApproveDocument("fullBodyPhoto")}
+                              className="text-green-600 border-green-600 hover:bg-green-50"
+                              disabled={documents.fullBodyPhoto.status === "approved"}
+                            >
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              Approve
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="destructive"
+                              onClick={() => openRejectionDialog("fullBodyPhoto")}
+                              disabled={documents.fullBodyPhoto.status === "rejected"}
+                            >
+                              <XCircle className="h-3 w-3 mr-1" />
+                              Reject
+                            </Button>
+                          </div>
+                        )}
+                        
                         {/* Upload button for missing documents */}
-                        {!documents.fullBodyPhoto.file && (
+                        {!isAdmin && !documents.fullBodyPhoto.file && (
                           <div className="flex gap-2">
                             <Input
                               type="file"
@@ -697,7 +797,7 @@ export default function WorkerProfile() {
                           </div>
                         )}
                         {/* Update button when editing */}
-                        {isEditingDocuments && documents.fullBodyPhoto.file && (
+                        {!isAdmin && isEditingDocuments && documents.fullBodyPhoto.file && (
                           <div className="flex gap-2">
                             <Input
                               type="file"
@@ -741,7 +841,7 @@ export default function WorkerProfile() {
                                 <span className="text-sm">Passport / National ID uploaded successfully</span>
                               </div>
                               <div className="flex gap-2 justify-center">
-                                {isEditingDocuments ? (
+                                {!isAdmin && isEditingDocuments ? (
                                   <>
                                     <Input
                                       type="file"
@@ -781,6 +881,8 @@ export default function WorkerProfile() {
                             </div>
                           ) : (
                             <div className="text-center">
+                              {!isAdmin ? (
+                                <>
                               <Input
                                 type="file"
                                 accept="image/*,.pdf"
@@ -790,13 +892,63 @@ export default function WorkerProfile() {
                               />
                               <label
                                 htmlFor="passportId"
-                                className="cursor-pointer"
-                              >
-                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                                  <FileText className="w-8 h-8 text-blue-400" />
-                                  <span className="text-sm text-blue-600 font-medium">Upload Document</span>
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                                      <FileText className="w-8 h-8 text-blue-400" />
+                                      <span className="text-sm text-blue-600 font-medium">Upload Document</span>
                                 </div>
                               </label>
+                                </>
+                              ) : (
+                                // Admin view - show mock PDF
+                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                                  <FileText className="w-8 h-8 text-gray-400" />
+                                  <span className="text-sm text-gray-600 font-medium">No Document Uploaded</span>
+                            </div>
+                          )}
+                        </div>
+                          )}
+                          
+                          {/* Admin Controls */}
+                          {isAdmin && documents.passportId.status === "pending" && (
+                            <div className="flex gap-2 mt-2 justify-center">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => window.open('/mock-passport.pdf', '_blank')}
+                                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                              >
+                                <Eye className="h-3 w-3 mr-1" />
+                                Preview
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => handleApproveDocument("passportId")}
+                                className="text-green-600 border-green-600 hover:bg-green-50"
+                              >
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                Approve
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="destructive"
+                                onClick={() => openRejectionDialog("passportId")}
+                              >
+                                <XCircle className="h-3 w-3 mr-1" />
+                                Reject
+                              </Button>
+                            </div>
+                          )}
+                          
+                          {/* Rejection Reason Display */}
+                          {documents.passportId.status === "rejected" && documents.passportId.rejectionReason && (
+                            <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg mt-3">
+                              <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                              <span className="text-sm text-red-700">
+                                {documents.passportId.rejectionReason}
+                              </span>
                             </div>
                           )}
                         </div>
@@ -859,6 +1011,8 @@ export default function WorkerProfile() {
                             </div>
                           ) : (
                             <div className="text-center">
+                              {!isAdmin ? (
+                                <>
                               <Input
                                 type="file"
                                 accept="image/*,.pdf"
@@ -870,13 +1024,53 @@ export default function WorkerProfile() {
                               />
                               <label
                                 htmlFor="educationalCertificate"
-                                className="cursor-pointer"
-                              >
-                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                                  <GraduationCap className="w-8 h-8 text-blue-400" />
-                                  <span className="text-sm text-blue-600 font-medium">Upload Certificate</span>
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                                      <GraduationCap className="w-8 h-8 text-blue-400" />
+                                      <span className="text-sm text-blue-600 font-medium">Upload Certificate</span>
                                 </div>
                               </label>
+                                </>
+                              ) : (
+                                // Admin view - show mock PDF
+                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                                  <GraduationCap className="w-8 h-8 text-gray-400" />
+                                  <span className="text-sm text-gray-600 font-medium">No Certificate Uploaded</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          
+                          {/* Admin Controls */}
+                          {isAdmin && documents.educationalCertificate.status === "pending" && (
+                            <div className="flex gap-2 mt-2 justify-center">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => window.open('/mock-educational-certificate.pdf', '_blank')}
+                                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                              >
+                                <Eye className="h-3 w-3 mr-1" />
+                                Preview
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => handleApproveDocument("educationalCertificate")}
+                                className="text-green-600 border-green-600 hover:bg-green-50"
+                              >
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                Approve
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="destructive"
+                                onClick={() => openRejectionDialog("educationalCertificate")}
+                              >
+                                <XCircle className="h-3 w-3 mr-1" />
+                                Reject
+                              </Button>
                             </div>
                           )}
                         </div>
@@ -937,6 +1131,8 @@ export default function WorkerProfile() {
                             </div>
                           ) : (
                             <div className="text-center">
+                              {!isAdmin ? (
+                                <>
                               <Input
                                 type="file"
                                 accept="image/*,.pdf"
@@ -948,13 +1144,21 @@ export default function WorkerProfile() {
                               />
                               <label
                                 htmlFor="medicalCertificate"
-                                className="cursor-pointer"
-                              >
-                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                                  <Heart className="w-8 h-8 text-blue-400" />
-                                  <span className="text-sm text-blue-600 font-medium">Upload Document</span>
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                                      <Heart className="w-8 h-8 text-blue-400" />
+                                      <span className="text-sm text-blue-600 font-medium">Upload Document</span>
                                 </div>
                               </label>
+                                </>
+                              ) : (
+                                // Admin view - show mock PDF
+                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                                  <Heart className="w-8 h-8 text-gray-400" />
+                                  <span className="text-sm text-gray-600 font-medium">No Document Uploaded</span>
+                                </div>
+                              )}
                             </div>
                           )}
                           {documents.medicalCertificate.status === "rejected" &&
@@ -966,6 +1170,38 @@ export default function WorkerProfile() {
                                 </span>
                               </div>
                             )}
+                          
+                          {/* Admin Controls */}
+                          {isAdmin && documents.medicalCertificate.status === "pending" && (
+                            <div className="flex gap-2 mt-2 justify-center">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => window.open('/mock-medical-certificate.pdf', '_blank')}
+                                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                              >
+                                <Eye className="h-3 w-3 mr-1" />
+                                Preview
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => handleApproveDocument("medicalCertificate")}
+                                className="text-green-600 border-green-600 hover:bg-green-50"
+                              >
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                Approve
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="destructive"
+                                onClick={() => openRejectionDialog("medicalCertificate")}
+                              >
+                                <XCircle className="h-3 w-3 mr-1" />
+                                Reject
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -1022,6 +1258,8 @@ export default function WorkerProfile() {
                             </div>
                           ) : (
                             <div className="text-center">
+                              {!isAdmin ? (
+                                <>
                               <Input
                                 type="file"
                                 accept="image/*,.pdf"
@@ -1031,13 +1269,53 @@ export default function WorkerProfile() {
                               />
                               <label
                                 htmlFor="visa"
-                                className="cursor-pointer"
-                              >
-                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                                  <FileText className="w-8 h-8 text-blue-400" />
-                                  <span className="text-sm text-blue-600 font-medium">Upload Document</span>
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                                      <FileText className="w-8 h-8 text-blue-400" />
+                                      <span className="text-sm text-blue-600 font-medium">Upload Document</span>
                                 </div>
                               </label>
+                                </>
+                              ) : (
+                                // Admin view - show mock PDF
+                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                                  <FileText className="w-8 h-8 text-gray-400" />
+                                  <span className="text-sm text-gray-600 font-medium">No Document Uploaded</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          
+                          {/* Admin Controls */}
+                          {isAdmin && documents.visa.status === "pending" && (
+                            <div className="flex gap-2 mt-2 justify-center">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => window.open('/mock-visa.pdf', '_blank')}
+                                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                              >
+                                <Eye className="h-3 w-3 mr-1" />
+                                Preview
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => handleApproveDocument("visa")}
+                                className="text-green-600 border-green-600 hover:bg-green-50"
+                              >
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                Approve
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="destructive"
+                                onClick={() => openRejectionDialog("visa")}
+                              >
+                                <XCircle className="h-3 w-3 mr-1" />
+                                Reject
+                              </Button>
                             </div>
                           )}
                         </div>
@@ -1098,6 +1376,8 @@ export default function WorkerProfile() {
                             </div>
                           ) : (
                             <div className="text-center">
+                              {!isAdmin ? (
+                                <>
                               <Input
                                 type="file"
                                 accept="image/*,.pdf"
@@ -1107,13 +1387,53 @@ export default function WorkerProfile() {
                               />
                               <label
                                 htmlFor="experienceLetter"
-                                className="cursor-pointer"
-                              >
-                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                                  <FileText className="w-8 h-8 text-blue-400" />
-                                  <span className="text-sm text-blue-600 font-medium">Upload Document</span>
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                                      <FileText className="w-8 h-8 text-blue-400" />
+                                      <span className="text-sm text-blue-600 font-medium">Upload Document</span>
                                 </div>
                               </label>
+                                </>
+                              ) : (
+                                // Admin view - show mock PDF
+                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                                  <FileText className="w-8 h-8 text-gray-400" />
+                                  <span className="text-sm text-gray-600 font-medium">No Document Uploaded</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          
+                          {/* Admin Controls */}
+                          {isAdmin && documents.experienceLetter.status === "pending" && (
+                            <div className="flex gap-2 mt-2 justify-center">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => window.open('/mock-experience-letter.pdf', '_blank')}
+                                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                              >
+                                <Eye className="h-3 w-3 mr-1" />
+                                Preview
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => handleApproveDocument("experienceLetter")}
+                                className="text-green-600 border-green-600 hover:bg-green-50"
+                              >
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                Approve
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="destructive"
+                                onClick={() => openRejectionDialog("experienceLetter")}
+                              >
+                                <XCircle className="h-3 w-3 mr-1" />
+                                Reject
+                              </Button>
                             </div>
                           )}
                         </div>
@@ -1174,6 +1494,8 @@ export default function WorkerProfile() {
                             </div>
                           ) : (
                             <div className="text-center">
+                              {!isAdmin ? (
+                                <>
                               <Input
                                 type="file"
                                 accept="image/*,.pdf"
@@ -1183,13 +1505,53 @@ export default function WorkerProfile() {
                               />
                               <label
                                 htmlFor="policeClearance"
-                                className="cursor-pointer"
-                              >
-                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                                  <Shield className="w-8 h-8 text-blue-400" />
-                                  <span className="text-sm text-blue-600 font-medium">Upload Document</span>
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                                      <Shield className="w-8 h-8 text-blue-400" />
+                                      <span className="text-sm text-blue-600 font-medium">Upload Document</span>
                                 </div>
                               </label>
+                                </>
+                              ) : (
+                                // Admin view - show mock PDF
+                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                                  <Shield className="w-8 h-8 text-gray-400" />
+                                  <span className="text-sm text-gray-600 font-medium">No Document Uploaded</span>
+                            </div>
+                          )}
+                        </div>
+                          )}
+                          
+                          {/* Admin Controls */}
+                          {isAdmin && documents.policeClearance.status === "pending" && (
+                            <div className="flex gap-2 mt-2 justify-center">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => window.open('/mock-police-clearance.pdf', '_blank')}
+                                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                              >
+                                <Eye className="h-3 w-3 mr-1" />
+                                Preview
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => handleApproveDocument("policeClearance")}
+                                className="text-green-600 border-green-600 hover:bg-green-50"
+                              >
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                Approve
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="destructive"
+                                onClick={() => openRejectionDialog("policeClearance")}
+                              >
+                                <XCircle className="h-3 w-3 mr-1" />
+                                Reject
+                              </Button>
                             </div>
                           )}
                         </div>
@@ -1197,6 +1559,7 @@ export default function WorkerProfile() {
                     </div>
                   </div>
 
+                  {!isAdmin && (
                   <div className="mt-8 border-t pt-6">
                     <Label className="text-sm font-medium mb-4 block">
                       E-Signature <span className="text-red-500">*</span>
@@ -1208,7 +1571,6 @@ export default function WorkerProfile() {
                           height={200}
                           className="signature-canvas border rounded w-full bg-white"
                           onEnd={() => setHasSignature(!(signatureRef.current as any)?.isEmpty?.())}
-                          ref={signatureRef}
                         />
                       </div>
                       <div className="flex gap-2">
@@ -1228,13 +1590,16 @@ export default function WorkerProfile() {
                       )}
                     </div>
                   </div>
+                  )}
 
+                  {!isAdmin && (
                   <div className="mt-6 flex justify-end">
                     <Button className="bg-blue-600 hover:bg-blue-700">
                       <Upload className="w-4 h-4 mr-2" />
                       Save Documents
                     </Button>
                   </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -1265,6 +1630,61 @@ export default function WorkerProfile() {
           </div>
         </div>
       </div>
+
+      {/* Rejection Reason Dialog */}
+      <Dialog open={showRejectionDialog} onOpenChange={setShowRejectionDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Document</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="rejection-reason">Rejection Reason</Label>
+              <Textarea
+                id="rejection-reason"
+                placeholder="Please provide a reason for rejecting this document..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                className="w-full mt-2"
+                rows={4}
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowRejectionDialog(false)}>
+                Cancel
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={submitRejection}
+                disabled={!rejectionReason.trim()}
+              >
+                <XCircle className="h-4 w-4 mr-2" />
+                Reject Document
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
+  )
+}
+
+export default function WorkerProfile() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen bg-gray-50">
+        <WorkerSidebar />
+        <div className="flex-1 p-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading worker profile...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }>
+      <WorkerProfileContent />
+    </Suspense>
   )
 }
