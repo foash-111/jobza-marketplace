@@ -62,6 +62,9 @@ interface LongTermJobDetailsProps {
     transportAllowance: string
     externalLodge: string
     accommodationAllowance: string
+    // Optional flags for labels
+    isUrgent?: boolean
+    typeLabel?: string // e.g., "Long Term"
   }
 }
 
@@ -71,14 +74,19 @@ export function LongTermJobDetails({ job }: LongTermJobDetailsProps) {
       {/* Job Overview */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-start sm:items-center justify-between gap-3">
             <div>
               <CardTitle className="text-2xl">{job.title}</CardTitle>
               <CardDescription className="text-lg">{job.agency}</CardDescription>
             </div>
-            <Badge variant="default">
-              Long Term
-            </Badge>
+            <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:gap-2">
+              <Badge variant="default" className="w-fit">
+                {job.typeLabel || "Long Term"}
+              </Badge>
+              {job.isUrgent && (
+                <Badge variant="destructive" className="w-fit">Urgent</Badge>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>

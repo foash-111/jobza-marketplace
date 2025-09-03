@@ -101,20 +101,20 @@ export default function WorkerApplications() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-200/50 text-yellow-700 dark:bg-yellow-400/20 dark:text-yellow-300"
       case "under_review":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-200/50 text-blue-700 dark:bg-blue-400/20 dark:text-blue-300"
       case "accepted":
-        return "bg-green-100 text-green-800"
+        return "bg-green-200/50 text-green-700 dark:bg-green-400/20 dark:text-green-300"
       case "rejected":
-        return "bg-red-100 text-red-800"
+        return "bg-red-200/50 text-red-700 dark:bg-red-400/20 dark:text-red-300"
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-muted text-muted-foreground"
     }
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-background">
       <WorkerSidebar />
 
       <div className="flex-1 p-6">
@@ -130,8 +130,8 @@ export default function WorkerApplications() {
           </div>
 
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">My Applications</h1>
-            <p className="text-gray-600">Track all your job applications and their status</p>
+            <h1 className="text-3xl font-bold text-foreground mb-2">My Applications</h1>
+            <p className="text-muted-foreground">Track all your job applications and their status</p>
           </div>
 
           {/* Filters */}
@@ -140,7 +140,7 @@ export default function WorkerApplications() {
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                     <Input
                       placeholder="Search applications..."
                       value={searchTerm}
@@ -189,7 +189,7 @@ export default function WorkerApplications() {
                 {filteredApplications.map((application) => (
                   <div
                     key={application.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted transition-colors"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-4">
@@ -201,12 +201,12 @@ export default function WorkerApplications() {
                               {application.type}
                             </Badge>
                           </div>
-                          <p className="text-sm text-gray-600 mb-1">
+                          <p className="text-sm text-muted-foreground mb-1">
                             {application.familyName || application.agencyName} • {application.location}
                           </p>
                           <p className="text-sm font-medium text-green-600 mb-1">{application.budget}</p>
-                          <p className="text-xs text-gray-500 mb-2">{application.description}</p>
-                          <p className="text-xs text-gray-500">Applied: {application.appliedDate}</p>
+                          <p className="text-xs text-muted-foreground mb-2">{application.description}</p>
+                          <p className="text-xs text-muted-foreground">Applied: {application.appliedDate}</p>
                         </div>
                       </div>
                     </div>
@@ -221,8 +221,8 @@ export default function WorkerApplications() {
                   </div>
                 ))}
                 {filteredApplications.length === 0 && (
-                  <div className="text-center py-12 text-gray-500">
-                    <Clock className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Clock className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
                     <p className="text-lg font-medium mb-2">No applications found</p>
                     <p className="text-sm">Try adjusting your search or filters</p>
                   </div>

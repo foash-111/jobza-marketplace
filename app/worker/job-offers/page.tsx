@@ -399,13 +399,13 @@ export default function JobOffersPage() {
                           )}
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Badge variant={job.type === "long-term" ? "default" : "secondary"}>
+                      <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:gap-2">
+                        <Badge variant={job.type === "long-term" ? "default" : "secondary"} className="w-fit">
                           {job.type === "long-term" ? "Long Term" : "Short Term"}
                         </Badge>
-                        {job.status === "urgent" && <Badge variant="destructive">Urgent</Badge>}
+                        {job.status === "urgent" && <Badge variant="destructive" className="w-fit">Urgent</Badge>}
                         {job.status === "new" && (
-                          <Badge variant="outline" className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700">
+                          <Badge variant="outline" className="w-fit bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700">
                             New
                           </Badge>
                         )}

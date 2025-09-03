@@ -248,11 +248,11 @@ function WorkerProfileContent() {
 
   // Helper function to ensure photos fit properly within borders
   const getPhotoContainerStyle = () => {
-    return "w-full h-64 object-contain bg-gray-50 rounded-lg"
+    return "w-full h-64 object-contain bg-background rounded-lg"
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-background">
       <WorkerSidebar />
 
       <div className="flex-1 p-6">
@@ -606,7 +606,7 @@ function WorkerProfileContent() {
 
                             </div>
                           ) : (
-                            <div className="h-48 flex items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
+                            <div className="h-48 flex items-center justify-center bg-background border-2 border-dashed border-gray-300 rounded-lg">
                               <div className="text-center">
                                 <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
                                 <span className="text-sm text-gray-600">No photo uploaded</span>
@@ -723,7 +723,7 @@ function WorkerProfileContent() {
 
                             </div>
                           ) : (
-                            <div className="h-64 flex items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
+                            <div className="h-64 flex items-center justify-center bg-background border-2 border-dashed border-gray-300 rounded-lg">
                               <div className="text-center">
                                 <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
                                 <span className="text-sm text-gray-600">No photo uploaded</span>
@@ -902,7 +902,7 @@ function WorkerProfileContent() {
                                 </>
                               ) : (
                                 // Admin view - show mock PDF
-                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-background">
                                   <FileText className="w-8 h-8 text-gray-400" />
                                   <span className="text-sm text-gray-600 font-medium">No Document Uploaded</span>
                             </div>
@@ -1034,7 +1034,7 @@ function WorkerProfileContent() {
                                 </>
                               ) : (
                                 // Admin view - show mock PDF
-                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-background">
                                   <GraduationCap className="w-8 h-8 text-gray-400" />
                                   <span className="text-sm text-gray-600 font-medium">No Certificate Uploaded</span>
                                 </div>
@@ -1154,7 +1154,7 @@ function WorkerProfileContent() {
                                 </>
                               ) : (
                                 // Admin view - show mock PDF
-                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-background">
                                   <Heart className="w-8 h-8 text-gray-400" />
                                   <span className="text-sm text-gray-600 font-medium">No Document Uploaded</span>
                                 </div>
@@ -1279,7 +1279,7 @@ function WorkerProfileContent() {
                                 </>
                               ) : (
                                 // Admin view - show mock PDF
-                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-background">
                                   <FileText className="w-8 h-8 text-gray-400" />
                                   <span className="text-sm text-gray-600 font-medium">No Document Uploaded</span>
                                 </div>
@@ -1397,7 +1397,7 @@ function WorkerProfileContent() {
                                 </>
                               ) : (
                                 // Admin view - show mock PDF
-                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-background">
                                   <FileText className="w-8 h-8 text-gray-400" />
                                   <span className="text-sm text-gray-600 font-medium">No Document Uploaded</span>
                                 </div>
@@ -1515,7 +1515,7 @@ function WorkerProfileContent() {
                                 </>
                               ) : (
                                 // Admin view - show mock PDF
-                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                                <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lgbg-background">
                                   <Shield className="w-8 h-8 text-gray-400" />
                                   <span className="text-sm text-gray-600 font-medium">No Document Uploaded</span>
                             </div>
@@ -1672,7 +1672,7 @@ function WorkerProfileContent() {
 export default function WorkerProfile() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-background">
         <WorkerSidebar />
         <div className="flex-1 p-6">
           <div className="flex items-center justify-center h-64">

@@ -8,20 +8,12 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { 
-  Users, 
-  MapPin, 
-  Calendar, 
-  DollarSign, 
-  Clock, 
-  CheckCircle, 
-  ArrowLeft,
-  UserPlus,
-  Star,
-  Building2
-} from "lucide-react"
+import { Users, MapPin, Calendar, DollarSign, Clock, CheckCircle, ArrowLeft, UserPlus, Star, Building2 } from "lucide-react"
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
 import { SharedHeader } from "@/components/layout/shared-header"
+import { JobDetails } from "@/components/shared/JobDetails"
+import { AssignedWorkersTab } from "@/components/shared/AssignedWorkersTab"
+import { AssignWorkersModal } from "@/components/shared/AssignWorkersModal"
 
 interface JobRequest {
   id: number
@@ -160,7 +152,7 @@ export default function JobDetailsPage() {
     // Mock assigned workers data for ongoing requests
     const mockAssignedWorkers: AssignedWorker[] = [
       {
-        id: 1,
+        id: 1001, // Use different ID range to avoid conflicts with affiliated workers
         name: "Maria Garcia",
         specialization: "Housekeeping",
         rating: 4.7,
@@ -170,7 +162,7 @@ export default function JobDetailsPage() {
         employerFeedback: 'Excellent candidate, very professional'
       },
       {
-        id: 2,
+        id: 1002, // Use different ID range to avoid conflicts with affiliated workers
         name: "Fatima Al-Zahra",
         specialization: "Housekeeping",
         rating: 4.9,
@@ -202,8 +194,9 @@ export default function JobDetailsPage() {
     // Add assigned workers to the assignedWorkers state
     const newlyAssignedWorkers = affiliatedWorkers.filter(worker => 
       selectedWorkers.includes(worker.id)
-    ).map(worker => ({
+    ).map((worker, index) => ({
       ...worker,
+      id: Date.now() + index, // Generate unique IDs to avoid conflicts
       status: 'pending' as const,
       assignedDate: new Date().toISOString().split('T')[0]
     }))
@@ -262,168 +255,54 @@ export default function JobDetailsPage() {
         <Card>
           <CardContent className="p-0">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="pending">Job Details</TabsTrigger>
-                <TabsTrigger value="ongoing">Assigned Workers</TabsTrigger>
-              </TabsList>
+              <div className="flex justify-center p-6 pb-0">
+                <TabsList className="w-full max-w-md">
+                  <TabsTrigger value="pending" className="text-sm font-medium flex-1">Job Details</TabsTrigger>
+                  <TabsTrigger value="ongoing" className="text-sm font-medium flex-1">Assigned Workers</TabsTrigger>
+                </TabsList>
+              </div>
 
               {/* Job Details Tab */}
               <TabsContent value="pending" className="p-6">
-                <div className="space-y-6">
-                  {/* Job Overview */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-2xl">{jobRequest.jobTitle}</CardTitle>
-                <CardDescription className="text-lg">{jobRequest.familyName}</CardDescription>
-              </div>
-              <Badge variant={jobRequest.status === "pending" ? "secondary" : "default"}>
-                {jobRequest.status}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">{jobRequest.location}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">{jobRequest.budget}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Start: {jobRequest.startDate}</span>
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-medium text-foreground mb-2">Job Description</h3>
-                <p className="text-muted-foreground leading-relaxed">{jobRequest.description}</p>
-              </div>
-              
-              <div>
-                <h3 className="font-medium text-foreground mb-2">Working Hours</h3>
-                <p className="text-muted-foreground">{jobRequest.workingHours}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Requirements */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Requirements & Skills</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {jobRequest.requirements.map((requirement, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span className="text-sm text-muted-foreground">{requirement}</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Family Details */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Family Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-medium text-foreground mb-3">Household Information</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Total Members:</span>
-                    <span className="text-sm font-medium">{jobRequest.familyDetails.members}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Children:</span>
-                    <span className="text-sm font-medium">{jobRequest.familyDetails.children}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Elderly:</span>
-                    <span className="text-sm font-medium">{jobRequest.familyDetails.elderly}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Pets:</span>
-                    <span className="text-sm font-medium">{jobRequest.familyDetails.pets ? "Yes" : "No"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">House Size:</span>
-                    <span className="text-sm font-medium">{jobRequest.familyDetails.houseSize}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-foreground mb-3">Benefits & Accommodation</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Accommodation:</span>
-                    <span className="text-sm font-medium">{jobRequest.additionalInfo.accommodation ? "Provided" : "Not provided"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Meals:</span>
-                    <span className="text-sm font-medium">{jobRequest.additionalInfo.meals ? "Provided" : "Not provided"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Transportation:</span>
-                    <span className="text-sm font-medium">{jobRequest.additionalInfo.transportation ? "Provided" : "Not provided"}</span>
-                  </div>
-                </div>
-                
-                <div className="mt-4">
-                  <h5 className="font-medium text-foreground mb-2">Additional Benefits</h5>
-                  <div className="flex flex-wrap gap-2">
-                    {jobRequest.additionalInfo.benefits.map((benefit, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {benefit}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-                  {/* Assign Workers Section - Only for Pending Requests */}
-                  <Card>
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <CardTitle>Assign Workers</CardTitle>
-                          <CardDescription>Select from your affiliated workers to assign to this job</CardDescription>
-                        </div>
-                        <Button onClick={() => setShowWorkerAssignment(true)}>
-                          <UserPlus className="h-4 w-4 mr-2" />
-                          Assign Workers
-                        </Button>
+                <JobDetails audience="agency" job={{
+                  jobTitle: jobRequest.jobTitle,
+                  familyName: jobRequest.familyName,
+                  location: jobRequest.location,
+                  budget: jobRequest.budget,
+                  startDate: jobRequest.startDate,
+                  workingHours: jobRequest.workingHours,
+                  requirements: jobRequest.requirements,
+                  description: jobRequest.description,
+                  familyDetails: jobRequest.familyDetails,
+                  additionalInfo: jobRequest.additionalInfo,
+                  status: jobRequest.status,
+                }} />
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle>Assign Workers</CardTitle>
+                        <CardDescription>Select from your affiliated workers to assign to this job</CardDescription>
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-center py-8 text-muted-foreground">
-                        <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-                        <p>No workers assigned yet</p>
-                        <p className="text-sm">Click "Assign Workers" to select from your affiliated workers</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                      <Button onClick={() => setShowWorkerAssignment(true)}>
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Assign Workers
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                      <p>No workers assigned yet</p>
+                      <p className="text-sm">Click "Assign Workers" to select from your affiliated workers</p>
+                    </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
 
               {/* Assigned Workers Tab */}
               <TabsContent value="ongoing" className="p-6">
                 <div className="space-y-6">
-                  {/* Success Message */}
                   {showSuccessMessage && (
                     <Card className="border-green-200 bg-green-50">
                       <CardContent className="p-4">
@@ -437,99 +316,16 @@ export default function JobDetailsPage() {
                       </CardContent>
                     </Card>
                   )}
-                  
-                  {/* Assigned Workers Overview */}
-                  <Card>
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <CardTitle>Assigned Workers</CardTitle>
-                          <CardDescription>Track the status of workers assigned to this job</CardDescription>
-                        </div>
-                        <Button onClick={() => setShowWorkerAssignment(true)}>
-                          <UserPlus className="h-4 w-4 mr-2" />
-                          Assign More Workers
-                        </Button>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      {assignedWorkers.length > 0 ? (
-                        <div className="space-y-4">
-                          {assignedWorkers.map((worker) => (
-                            <div key={worker.id} className="flex items-center justify-between p-4 border rounded-lg bg-card">
-                              <div className="flex items-center gap-4">
-                                <Avatar>
-                                  <AvatarImage src="/placeholder.svg" alt={worker.name} />
-                                  <AvatarFallback>{worker.name.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                                <div>
-                                  <p className="font-medium text-card-foreground">{worker.name}</p>
-                                  <p className="text-sm text-muted-foreground">
-                                    {worker.specialization} • ⭐ {worker.rating} • {worker.experience} years experience
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    Assigned: {worker.assignedDate}
-                                  </p>
-                                  {worker.employerFeedback && (
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                      Feedback: "{worker.employerFeedback}"
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                              
-                              <div className="flex items-center gap-3">
-                                <Badge 
-                                  variant={
-                                    worker.status === 'accepted' ? 'default' : 
-                                    worker.status === 'short_list' ? 'secondary' : 
-                                    worker.status === 'rejected' ? 'destructive' : 'outline'
-                                  }
-                                  className="text-sm"
-                                >
-                                  {worker.status === 'accepted' ? '✅ Accepted' :
-                                   worker.status === 'short_list' ? '📋 Short List' :
-                                   worker.status === 'rejected' ? '❌ Rejected' : '⏳ Pending'}
-                                </Badge>
-                                
-                                {worker.status === 'accepted' && (
-                                  <Button 
-                                    size="sm" 
-                                    onClick={() => router.push(`/contracts/create?familyId=${jobRequest.id}&workerId=${worker.id}`)}
-                                  >
-                                    Proceed with Contract
-                                  </Button>
-                                )}
-                                
-                                {/* Demo: Update Status (remove in production) */}
-                                {worker.status !== 'accepted' && (
-                                  <Button 
-                                    size="sm" 
-                                    variant="outline"
-                                    onClick={() => {
-                                      const newStatus = worker.status === 'pending' ? 'short_list' : 
-                                                     worker.status === 'short_list' ? 'accepted' : 'pending'
-                                      setAssignedWorkers(prev => prev.map(w => 
-                                        w.id === worker.id ? { ...w, status: newStatus } : w
-                                      ))
-                                    }}
-                                  >
-                                    Update Status
-                                  </Button>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-center py-8 text-muted-foreground">
-                          <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-                          <p>No workers assigned yet</p>
-                          <p className="text-sm">Click "Assign More Workers" to select from your affiliated workers</p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
+                  <AssignedWorkersTab 
+                    assignedWorkers={assignedWorkers}
+                    onProceedContract={(workerId) => router.push(`/contracts/create?familyId=${jobRequest.id}&workerId=${workerId}`)}
+                  />
+                  <div className="flex justify-end">
+                    <Button onClick={() => setShowWorkerAssignment(true)}>
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Assign More Workers
+                    </Button>
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>
@@ -538,83 +334,14 @@ export default function JobDetailsPage() {
 
 
 
-        {/* Worker Assignment Modal */}
-        {showWorkerAssignment && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-background border border-border rounded-lg p-6 max-w-4xl w-full mx-4 shadow-xl max-h-[80vh] overflow-y-auto">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-foreground">Assign Workers to Job</h2>
-                <Button variant="ghost" size="sm" onClick={() => setShowWorkerAssignment(false)}>
-                  ✕
-                </Button>
-              </div>
-              
-              <div className="space-y-4">
-                <p className="text-muted-foreground">
-                  Select workers from your affiliated pool. Workers are ranked by match score.
-                </p>
-                
-                <div className="space-y-3">
-                  {affiliatedWorkers.map((worker) => (
-                    <div
-                      key={worker.id}
-                      className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-colors ${
-                        selectedWorkers.includes(worker.id)
-                          ? "border-primary bg-primary/5"
-                          : "border-border hover:border-primary/30"
-                      }`}
-                      onClick={() => handleWorkerSelection(worker.id)}
-                    >
-                      <div className="flex items-center gap-4">
-                        <Avatar>
-                          <AvatarImage src="/placeholder.svg" alt={worker.name} />
-                          <AvatarFallback>{worker.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium text-foreground">{worker.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {worker.specialization} • ⭐ {worker.rating} • {worker.experience} years experience
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            📍 {worker.location} • {worker.availability}
-                          </p>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {worker.skills.slice(0, 3).map((skill, index) => (
-                              <Badge key={index} variant="secondary" className="text-xs">
-                                {skill}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <Badge variant="outline" className="text-xs">
-                          Match: {worker.matchScore}%
-                        </Badge>
-                        {selectedWorkers.includes(worker.id) && (
-                          <CheckCircle className="h-5 w-5 text-primary" />
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="flex gap-3 justify-end pt-4 border-t">
-                  <Button variant="outline" onClick={() => setShowWorkerAssignment(false)}>
-                    Cancel
-                  </Button>
-                  <Button 
-                    onClick={handleAssignWorkers}
-                    disabled={selectedWorkers.length === 0}
-                  >
-                    Assign {selectedWorkers.length} Worker{selectedWorkers.length !== 1 ? 's' : ''}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        <AssignWorkersModal 
+          open={showWorkerAssignment}
+          workers={affiliatedWorkers}
+          selected={selectedWorkers}
+          onToggleSelect={handleWorkerSelection}
+          onClose={() => setShowWorkerAssignment(false)}
+          onAssign={handleAssignWorkers}
+        />
       </div>
     </DashboardLayout>
   )

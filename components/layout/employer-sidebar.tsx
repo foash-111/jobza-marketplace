@@ -12,17 +12,14 @@ const navigation = [
   { name: "Dashboard", href: "/employer/dashboard", icon: Home },
   { name: "Messages", href: "/messages", icon: MessageSquare },
   { name: "Profile", href: "/employer/profile", icon: User },
+  { name: "Logout", href: "/", icon: LogOut, onClick: () => { window.location.href = "/" } },
 ]
 
 export function EmployerSidebar() {
   const pathname = usePathname()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  const handleLogout = () => {
-    // Handle logout logic here
-    window.location.href = "/"
-  }
-
+ 
   return (
     <>
       {/* Mobile menu button */}
@@ -73,24 +70,7 @@ export function EmployerSidebar() {
             })}
           </nav>
 
-          {/* Theme Toggle */}
-          <div className="px-4 py-4 border-t border-sidebar-border">
-            <div className="flex items-center justify-center">
-              <ThemeToggle />
-            </div>
-          </div>
-
-          {/* Logout */}
-          <div className="px-4 py-4 border-t border-sidebar-border">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-              onClick={handleLogout}
-            >
-              <LogOut className="mr-4 h-5 w-5" />
-              Log Out
-            </Button>
-          </div>
+         
         </div>
       </div>
 

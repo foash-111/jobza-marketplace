@@ -6,8 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar, Users, Clock, Building2, AlertCircle } from "lucide-react"
-import { WorkerSidebar } from "@/components/layout/worker-sidebar"
+import { UnifiedSidebar } from "@/components/layout/unified-sidebar"
 import { JobDetailsModal } from "@/components/jobs/job-details-modal"
 import { SharedHeader } from "@/components/layout/shared-header"
 
@@ -249,10 +250,14 @@ export default function WorkerDashboard() {
 
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <WorkerSidebar />
-
-      <div className="flex-1 p-6">
+    <div className="min-h-screen bg-background">
+      <UnifiedSidebar 
+        userRole="worker"
+        userName="Sarah Johnson"
+        userEmail="sarah@example.com"
+      />
+      
+      <div className="lg:ml-64 p-6">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <SharedHeader 
@@ -309,11 +314,35 @@ export default function WorkerDashboard() {
           )}
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="long-term">Long Term</TabsTrigger>
-              <TabsTrigger value="short-term">Short Term</TabsTrigger>
-              <TabsTrigger value="affiliation-requests">Affiliation Requests</TabsTrigger>
+            {/* Mobile dropdown */}
+            <div className="sm:hidden">
+              <Select value={activeTab} onValueChange={setActiveTab}>
+                <SelectTrigger aria-label="Select section">
+                  <SelectValue placeholder="Select section" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="overview">Overview</SelectItem>
+                  <SelectItem value="long-term">Long Term</SelectItem>
+                  <SelectItem value="short-term">Short Term</SelectItem>
+                  <SelectItem value="affiliation-requests">Affiliation Requests</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Desktop/Tablet tab bar */}
+            <TabsList className="hidden sm:grid w-full grid-cols-3 md:grid-cols-4 gap-2">
+              <TabsTrigger value="overview" className="text-xs sm:text-sm">
+                <span>Overview</span>
+              </TabsTrigger>
+              <TabsTrigger value="long-term" className="text-xs sm:text-sm">
+                <span>Long Term</span>
+              </TabsTrigger>
+              <TabsTrigger value="short-term" className="text-xs sm:text-sm">
+                <span>Short Term</span>
+              </TabsTrigger>
+              <TabsTrigger value="affiliation-requests" className="text-xs sm:text-sm">
+                <span>Affiliation Requests</span>
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">

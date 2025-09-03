@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { 
   Users, 
@@ -266,17 +267,40 @@ export default function AgencyDashboard() {
         <SharedHeader 
           title="Agency Dashboard" 
           subtitle="Manage your workers, requests, and contracts" 
-          showNotification={true}
         />
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                        <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="family-requests">Families Requests</TabsTrigger>
-                <TabsTrigger value="affiliation-requests">Pending Affiliation Requests</TabsTrigger>
-                <TabsTrigger value="create-contracts">Create New Contracts</TabsTrigger>
-                <TabsTrigger value="contracts-history">Pending Contracts History</TabsTrigger>
-              </TabsList>
+          {/* Mobile dropdown */}
+          <div className="sm:hidden">
+            <Select value={activeTab} onValueChange={setActiveTab}>
+              <SelectTrigger aria-label="Select section">
+                <SelectValue placeholder="Select section" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="family-requests">Families Requests</SelectItem>
+                <SelectItem value="affiliation-requests">Pending Affiliation Requests</SelectItem>
+                <SelectItem value="create-contracts">Create New Contracts</SelectItem>
+                <SelectItem value="contracts-history">Pending Contracts History</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Desktop/Tablet tab bar */}
+          <TabsList className="hidden sm:grid w-full grid-cols-3 md:grid-cols-4 gap-2">
+            <TabsTrigger value="family-requests" className="text-xs sm:text-sm">
+              <span>Families Requests</span>
+            </TabsTrigger>
+            <TabsTrigger value="affiliation-requests" className="text-xs sm:text-sm">
+              <span>Pending Affiliation Requests</span>
+            </TabsTrigger>
+            <TabsTrigger value="create-contracts" className="text-xs sm:text-sm">
+              <span>Create New Contracts</span>
+            </TabsTrigger>
+            <TabsTrigger value="contracts-history" className="text-xs sm:text-sm">
+              <span>Pending Contracts History</span>
+            </TabsTrigger>
+          </TabsList>
 
           {/* Families Requests Tab with Sub-tabs */}
           <TabsContent value="family-requests" className="space-y-6">
@@ -287,20 +311,29 @@ export default function AgencyDashboard() {
               </CardHeader>
               <CardContent>
                 <Tabs defaultValue="pending" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="pending">Pending Requests</TabsTrigger>
-                    <TabsTrigger value="ongoing">Ongoing Requests</TabsTrigger>
-                    <TabsTrigger value="processed">Processed Requests</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3">
+                    <TabsTrigger value="pending" className="text-xs sm:text-sm">
+                      <span className="hidden sm:inline">Pending Requests</span>
+                      <span className="sm:hidden">Pending</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="ongoing" className="text-xs sm:text-sm">
+                      <span className="hidden sm:inline">Ongoing Requests</span>
+                      <span className="sm:hidden">Ongoing</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="processed" className="text-xs sm:text-sm">
+                      <span className="hidden sm:inline">Processed Requests</span>
+                      <span className="sm:hidden">Processed</span>
+                    </TabsTrigger>
                   </TabsList>
 
                   {/* Pending Requests Sub-tab - Agency Assigns Workers Here */}
                   <TabsContent value="pending" className="space-y-4 mt-4">
                     {pendingRequests.map((request) => (
-                      <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg bg-card hover-lift transition-theme">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-4">
+                      <div key={request.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border rounded-lg bg-card hover-lift transition-theme">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start sm:items-center gap-4">
                             <Users className="h-5 w-5 text-primary" />
-          <div>
+          <div className="min-w-0">
                               <p className="font-medium text-card-foreground">{request.jobTitle}</p>
                               <p className="text-sm text-muted-foreground">
                                 {request.familyName} • 📍 {request.location}
@@ -315,7 +348,7 @@ export default function AgencyDashboard() {
                             </div>
                           </div>
           </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 self-start sm:self-auto">
                           <Button
                             size="sm"
                             variant="outline"
@@ -341,8 +374,8 @@ export default function AgencyDashboard() {
                   <TabsContent value="ongoing" className="space-y-4 mt-4">
                     {ongoingRequests.map((request) => (
                       <div key={request.id} className="p-4 border rounded-lg bg-card hover-lift transition-theme">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                          <div className="flex items-start sm:items-center gap-4">
                             <Users className="h-5 w-5 text-primary" />
                             <div>
                               <p className="font-medium text-card-foreground">{request.jobTitle}</p>
@@ -352,7 +385,7 @@ export default function AgencyDashboard() {
                               <p className="text-sm font-medium text-green-600">{request.budget}</p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 self-start sm:self-auto">
                             <Badge variant="outline" className="text-xs">
                               {request.assignedWorkers.length} Worker{request.assignedWorkers.length !== 1 ? 's' : ''} Assigned
                             </Badge>
@@ -399,7 +432,7 @@ export default function AgencyDashboard() {
                           ))}
                 </div>
                         
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 self-start sm:self-auto">
                           <Button
                             size="sm"
                             variant="outline"
@@ -424,9 +457,9 @@ export default function AgencyDashboard() {
                   {/* Processed Requests Sub-tab */}
                   <TabsContent value="processed" className="space-y-4 mt-4">
                     {processedRequests.map((request) => (
-                      <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg bg-card hover-lift transition-theme">
+                      <div key={request.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border rounded-lg bg-card hover-lift transition-theme">
                         <div className="flex-1">
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-start sm:items-center gap-4">
                             <Users className="h-5 w-5 text-primary" />
                             <div>
                               <p className="font-medium text-card-foreground">{request.jobTitle}</p>
@@ -434,7 +467,7 @@ export default function AgencyDashboard() {
                                 {request.familyName} • 📍 {request.location}
                               </p>
                               <p className="text-sm font-medium text-green-600">{request.budget}</p>
-                              <div className="flex items-center gap-2 mt-2">
+                              <div className="flex items-center gap-2 mt-2 flex-wrap">
                                 <Badge variant="outline" className="text-xs">
                                   {request.assignedWorkers.length} Worker{request.assignedWorkers.length !== 1 ? 's' : ''} Assigned
                                 </Badge>
@@ -442,10 +475,10 @@ export default function AgencyDashboard() {
                                   Contract Created
                                 </Badge>
                               </div>
-                      </div>
-                    </div>
-                  </div>
-                        <div className="flex items-center gap-2">
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 self-start sm:self-auto">
                           <Button
                             size="sm"
                             variant="outline"
@@ -453,10 +486,10 @@ export default function AgencyDashboard() {
                           >
                             <Eye className="h-4 w-4 mr-2" />
                             View Contract
-                  </Button>
+                          </Button>
                         </div>
-                </div>
-              ))}
+                      </div>
+                    ))}
                     
                     {mockProcessedFamilyRequests.length === 0 && (
                       <div className="text-center py-8 text-muted-foreground">

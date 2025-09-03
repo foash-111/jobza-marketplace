@@ -74,7 +74,7 @@ function AdminProfileContent() {
 
   return (
     <DashboardLayout userRole="admin" userName="Admin" userEmail="admin@jobza.com">
-      <div className="space-y-6">
+      <div className="space-y-6 bg-background">
         <SharedHeader 
           title="Admin Profile" 
           subtitle="Manage your administrative account settings"

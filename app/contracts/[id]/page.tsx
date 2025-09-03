@@ -692,7 +692,7 @@ export default function ContractPage({ params }: { params: { id: string } }) {
 
   // Regular layout for worker and employer
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screenbg-background">
       {userRole === "employer" ? <EmployerSidebar /> : <WorkerSidebar />}
 
       <div className="flex-1 p-6">

@@ -185,7 +185,7 @@ export default function SelectAgenciesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screenbg-background">
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4">
@@ -411,13 +411,13 @@ export default function SelectAgenciesPage() {
 
                   {/* Performance Metrics */}
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="text-center p-2 bg-gray-50 rounded">
+                    <div className="text-center p-2bg-background rounded">
                       <p className="text-xs text-gray-600">Response Time</p>
                       <Badge className={getResponseTimeColor(agency.responseTime)}>
                         {agency.responseTime}
                       </Badge>
                     </div>
-                    <div className="text-center p-2 bg-gray-50 rounded">
+                    <div className="text-center p-2bg-background rounded">
                       <p className="text-xs text-gray-600">Success Rate</p>
                       <Badge className={getSuccessRateColor(agency.successRate)}>
                         {agency.successRate}

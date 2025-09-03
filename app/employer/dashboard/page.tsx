@@ -1,13 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { EmployerSidebar } from "@/components/layout/employer-sidebar"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { UnifiedSidebar } from "@/components/layout/unified-sidebar"
 import { SharedHeader } from "@/components/layout/shared-header"
 import {
   Plus,
@@ -26,6 +27,7 @@ import {
 export default function EmployerDashboard() {
   const [activeTab, setActiveTab] = useState("overview")
   const [applicationFilter, setApplicationFilter] = useState("all")
+  const [primaryAgencyId, setPrimaryAgencyId] = useState<number | null>(null)
 
   const router = useRouter()
 
@@ -80,6 +82,26 @@ export default function EmployerDashboard() {
     { id: 2, name: "Elite Care Agency", rating: 4.9, workers: 18, type: "placement" },
     { id: 3, name: "Trusted Helpers", rating: 4.7, workers: 32, type: "service" },
   ]
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("employer.primaryAgencyId")
+      if (stored) setPrimaryAgencyId(Number(stored))
+    } catch {}
+  }, [])
+
+  useEffect(() => {
+    try {
+      if (primaryAgencyId == null) {
+        localStorage.removeItem("employer.primaryAgencyId")
+      } else {
+        localStorage.setItem("employer.primaryAgencyId", String(primaryAgencyId))
+      }
+    } catch {}
+  }, [primaryAgencyId])
+
+  const handleSetPrimaryAgency = (agencyId: number) => setPrimaryAgencyId(agencyId)
+  const handleBrowseAgencies = () => setPrimaryAgencyId(null)
 
   const jobPostsHistory = [
     {
@@ -153,43 +175,65 @@ export default function EmployerDashboard() {
 
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <EmployerSidebar />
-
-      <div className="flex-1 lg:ml-64">
+    <div className="min-h-screen bg-background">
+      <UnifiedSidebar 
+        userRole="employer"
+        userName="John Smith"
+        userEmail="john@example.com"
+      />
+      
+      <div className="lg:ml-64">
         <div className="p-6">
           <div className="max-w-7xl mx-auto">
-                      {/* Header */}
-          <SharedHeader 
-            title="Employer Dashboard" 
-            subtitle="Manage your job postings and applications" 
-          />
+            {/* Header */}
+            <SharedHeader 
+              title="Employer Dashboard" 
+              subtitle="Manage your job postings and applications" 
+            />
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-6">
-                <TabsTrigger value="overview" className="flex items-center gap-2">
+              {/* Mobile dropdown */}
+              <div className="sm:hidden">
+                <Select value={activeTab} onValueChange={setActiveTab}>
+                  <SelectTrigger aria-label="Select section">
+                    <SelectValue placeholder="Select section" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="overview">Overview</SelectItem>
+                    <SelectItem value="applications">Job Applications</SelectItem>
+                    <SelectItem value="post-job">Post Job</SelectItem>
+                    <SelectItem value="job-history">My Job Posts History</SelectItem>
+                    <SelectItem value="contracts">Contracts</SelectItem>
+                    <SelectItem value="agencies">Primary Agencies</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Desktop/Tablet tab bar */}
+              <TabsList className="hidden sm:grid w-full grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
+                <TabsTrigger value="overview" className="flex items-center gap-2 text-sm">
                   <Home className="h-4 w-4" />
-                  Overview
+                  <span>Overview</span>
                 </TabsTrigger>
-                <TabsTrigger value="applications" className="flex items-center gap-2">
+                <TabsTrigger value="applications" className="flex items-center gap-2 text-sm">
                   <Briefcase className="h-4 w-4" />
-                  Job Applications
+                  <span>Job Applications</span>
                 </TabsTrigger>
-                <TabsTrigger value="post-job" className="flex items-center gap-2">
+                <TabsTrigger value="post-job" className="flex items-center gap-2 text-sm">
                   <Plus className="h-4 w-4" />
-                  Post Job
+                  <span>Post Job</span>
                 </TabsTrigger>
-                <TabsTrigger value="job-history" className="flex items-center gap-2">
+                <TabsTrigger value="job-history" className="flex items-center gap-2 text-sm">
                   <FileText className="h-4 w-4" />
-                  My Job Posts History
+                  <span>My Job Posts History</span>
                 </TabsTrigger>
-                <TabsTrigger value="contracts" className="flex items-center gap-2">
+                <TabsTrigger value="contracts" className="flex items-center gap-2 text-sm">
                   <FileText className="h-4 w-4" />
-                  Contracts
+                  <span>Contracts</span>
                 </TabsTrigger>
-                <TabsTrigger value="agencies" className="flex items-center gap-2">
+                <TabsTrigger value="agencies" className="flex items-center gap-2 text-sm">
                   <Building2 className="h-4 w-4" />
-                  Primary Agencies
+                  <span>Primary Agencies</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -216,6 +260,11 @@ export default function EmployerDashboard() {
                             </div>
                             <div className="flex items-center gap-2">
                               <Badge variant={app.status === "pending" ? "secondary" : "default"}>{app.status}</Badge>
+                              {app.status === "accepted" && (
+                                <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => router.push('/messages')}>
+                                  Contact
+                                </Button>
+                              )}
                               <Button size="sm" variant="outline" onClick={() => handleViewDetails(app)}>
                                 <Eye className="h-3 w-3 mr-1" />
                                 View Details
@@ -248,6 +297,11 @@ export default function EmployerDashboard() {
                             </div>
                             <div className="flex items-center gap-2">
                               <Badge variant={app.status === "pending" ? "secondary" : "default"}>{app.status}</Badge>
+                              {app.status === "accepted" && (
+                                <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => router.push('/messages')}>
+                                  Contact
+                                </Button>
+                              )}
                               <Button size="sm" variant="outline" onClick={() => handleViewDetails(app)}>
                                 <Eye className="h-3 w-3 mr-1" />
                                 View Details
@@ -272,18 +326,21 @@ export default function EmployerDashboard() {
                   </CardHeader>
                   <CardContent>
                     <Tabs value={applicationFilter} onValueChange={setApplicationFilter} className="w-full">
-                      <TabsList className="grid w-full grid-cols-3 mb-6">
-                        <TabsTrigger value="all" className="flex items-center gap-2">
-                          <Briefcase className="h-4 w-4" />
-                          All Job Applications
+                      <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mb-6 sm:grid">
+                        <TabsTrigger value="all" className="flex items-center gap-2 text-xs sm:text-sm">
+                          <Briefcase className="h-3 w-3 sm:h-4 sm:w-4" />
+                          <span className="hidden sm:inline">All Job Applications</span>
+                          <span className="sm:hidden">All</span>
                         </TabsTrigger>
-                        <TabsTrigger value="long-term" className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
-                          Long Term Applications
+                        <TabsTrigger value="long-term" className="flex items-center gap-2 text-xs sm:text-sm">
+                          <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+                          <span className="hidden sm:inline">Long Term Applications</span>
+                          <span className="sm:hidden">Long Term</span>
                         </TabsTrigger>
-                        <TabsTrigger value="short-term" className="flex items-center gap-2">
-                          <Clock className="h-4 w-4" />
-                          Short Term Applications
+                        <TabsTrigger value="short-term" className="flex items-center gap-2 text-xs sm:text-sm">
+                          <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
+                          <span className="hidden sm:inline">Short Term Applications</span>
+                          <span className="sm:hidden">Short Term</span>
                         </TabsTrigger>
                       </TabsList>
 
@@ -310,6 +367,11 @@ export default function EmployerDashboard() {
                             </div>
                             <div className="flex items-center gap-2">
                               <Badge variant={app.status === "pending" ? "secondary" : "default"}>{app.status}</Badge>
+                              {app.status === "accepted" && (
+                                <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => router.push('/messages')}>
+                                  Contact
+                                </Button>
+                              )}
                               <Button size="sm" onClick={() => handleViewDetails(app)}>
                                 <Eye className="h-3 w-3 mr-1" />
                                 View Details
@@ -530,7 +592,7 @@ export default function EmployerDashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {primaryAgencies.map((agency) => (
+                      {(primaryAgencyId ? primaryAgencies.filter(a => a.id === primaryAgencyId) : primaryAgencies).map((agency) => (
                         <div key={agency.id} className="flex items-center justify-between p-4 border rounded-lg">
                           <div className="flex items-center gap-4">
                             <Building2 className="h-5 w-5 text-blue-600" />
@@ -543,9 +605,14 @@ export default function EmployerDashboard() {
                                 <Users className="h-4 w-4" />
                                 <span>{agency.workers} workers</span>
                               </div>
-                              <Badge variant="outline" className="mt-1">
-                                {agency.type === "placement" ? "Placement Agency" : "Service Agency"}
-                              </Badge>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="outline">
+                                  {agency.type === "placement" ? "Placement Agency" : "Service Agency"}
+                                </Badge>
+                                {primaryAgencyId === agency.id && (
+                                  <Badge>Primary</Badge>
+                                )}
+                              </div>
                             </div>
                           </div>
                           <div className="flex gap-2">
@@ -554,9 +621,22 @@ export default function EmployerDashboard() {
                               View Profile
                             </Button>
                             <Button size="sm">Contact</Button>
+                            {primaryAgencyId !== agency.id && (
+                              <Button size="sm" variant="secondary" onClick={() => handleSetPrimaryAgency(agency.id)}>
+                                Set as Primary Agency
+                              </Button>
+                            )}
                           </div>
                         </div>
                       ))}
+                      {primaryAgencyId && (
+                        <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/30">
+                          <div className="text-sm text-gray-700">Only your primary agency is shown. Browse to choose another one.</div>
+                          <div className="flex gap-2">
+                            <Button size="sm" variant="outline" onClick={handleBrowseAgencies}>Browse Agencies</Button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { 
   Users, 
   Building2, 
@@ -367,11 +368,35 @@ function AdminDashboardContent() {
         <Card>
           <CardContent className="p-0">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="workers">Pending Workers ({getPendingCount('worker')})</TabsTrigger>
-                <TabsTrigger value="agencies">Pending Agencies ({getPendingCount('agency')})</TabsTrigger>
-                <TabsTrigger value="families">Pending Families ({getPendingCount('employer')})</TabsTrigger>
-                <TabsTrigger value="contracts">Pending Contracts ({getPendingContractsCount()})</TabsTrigger>
+              {/* Mobile dropdown */}
+              <div className="sm:hidden">
+                <Select value={activeTab} onValueChange={setActiveTab}>
+                  <SelectTrigger aria-label="Select section">
+                    <SelectValue placeholder="Select section" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="workers">Pending Workers ({getPendingCount('worker')})</SelectItem>
+                    <SelectItem value="agencies">Pending Agencies ({getPendingCount('agency')})</SelectItem>
+                    <SelectItem value="families">Pending Families ({getPendingCount('employer')})</SelectItem>
+                    <SelectItem value="contracts">Pending Contracts ({getPendingContractsCount()})</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Desktop/Tablet tab bar */}
+              <TabsList className="hidden sm:grid w-full grid-cols-3 md:grid-cols-4 gap-2">
+                <TabsTrigger value="workers" className="text-xs sm:text-sm">
+                  <span>Pending Workers ({getPendingCount('worker')})</span>
+                </TabsTrigger>
+                <TabsTrigger value="agencies" className="text-xs sm:text-sm">
+                  <span>Pending Agencies ({getPendingCount('agency')})</span>
+                </TabsTrigger>
+                <TabsTrigger value="families" className="text-xs sm:text-sm">
+                  <span>Pending Families ({getPendingCount('employer')})</span>
+                </TabsTrigger>
+                <TabsTrigger value="contracts" className="text-xs sm:text-sm">
+                  <span>Pending Contracts ({getPendingContractsCount()})</span>
+                </TabsTrigger>
               </TabsList>
 
               {/* Pending Workers Tab */}
@@ -625,10 +650,19 @@ function AdminDashboardContent() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="approved-workers" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="approved-workers">Approved Workers</TabsTrigger>
-                <TabsTrigger value="approved-agencies">Approved Agencies</TabsTrigger>
-                <TabsTrigger value="approved-families">Approved Families</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3">
+                <TabsTrigger value="approved-workers" className="text-xs sm:text-sm">
+                  <span className="hidden sm:inline">Approved Workers</span>
+                  <span className="sm:hidden">Workers</span>
+                </TabsTrigger>
+                <TabsTrigger value="approved-agencies" className="text-xs sm:text-sm">
+                  <span className="hidden sm:inline">Approved Agencies</span>
+                  <span className="sm:hidden">Agencies</span>
+                </TabsTrigger>
+                <TabsTrigger value="approved-families" className="text-xs sm:text-sm">
+                  <span className="hidden sm:inline">Approved Families</span>
+                  <span className="sm:hidden">Families</span>
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="approved-workers" className="mt-6">

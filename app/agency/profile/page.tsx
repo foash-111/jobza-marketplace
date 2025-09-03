@@ -98,7 +98,7 @@ export default function AgencyProfile() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-background">
       <div className="flex-1 p-6">
         <div className="mb-6">
           <Link href="/agency/dashboard">

@@ -636,7 +636,19 @@ function CreateContractPageContent() {
               </div>
               
               <div className="space-y-3">
-                {familyRequests.map((family) => (
+                <div className="mb-3">
+                  <Input
+                    placeholder="Search families..."
+                    onChange={(e) => {
+                      const q = e.target.value.toLowerCase()
+                      setFamilyRequests(prev => prev.map(f => f))
+                    }}
+                    className="bg-background border-border"
+                  />
+                </div>
+                {familyRequests
+                  .filter(f => `${f.familyName} ${f.jobTitle} ${f.location}`.toLowerCase().includes((document.getElementById('familySearch') as HTMLInputElement | null)?.value?.toLowerCase?.() || ''))
+                  .map((family) => (
                   <div
                     key={family.id}
                     className="flex items-center justify-between p-4 border rounded-lg bg-card hover-lift transition-theme cursor-pointer"
@@ -679,7 +691,19 @@ function CreateContractPageContent() {
               </div>
               
               <div className="space-y-3">
-                {affiliatedWorkers.map((worker) => (
+                <div className="mb-3">
+                  <Input
+                    placeholder="Search workers..."
+                    onChange={(e) => {
+                      const q = e.target.value.toLowerCase()
+                      setAffiliatedWorkers(prev => prev.map(w => w))
+                    }}
+                    className="bg-background border-border"
+                  />
+                </div>
+                {affiliatedWorkers
+                  .filter(w => `${w.name} ${w.specialization} ${w.location}`.toLowerCase().includes((document.getElementById('workerSearch') as HTMLInputElement | null)?.value?.toLowerCase?.() || ''))
+                  .map((worker) => (
                   <div
                     key={worker.id}
                     className="flex items-center justify-between p-4 border rounded-lg bg-card hover-lift transition-theme cursor-pointer"
