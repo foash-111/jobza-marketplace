@@ -25,6 +25,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { SharedHeader } from "@/components/layout/shared-header"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { NotificationPanel, useNotifications } from "@/components/ui/notification"
 
 // Mock data for pending family requests
@@ -169,6 +170,14 @@ const mockContracts = [
 export default function AgencyDashboard() {
   const router = useRouter()
   const { notifications, addNotification, removeNotification, markAsRead } = useNotifications()
+  const [confirmDialog, setConfirmDialog] = useState<{ open: boolean; type: "accept" | "decline" | null; request: any | null }>({ open: false, type: null, request: null })
+
+  const openConfirm = (type: "accept" | "decline", request: any) => setConfirmDialog({ open: true, type, request })
+  const closeConfirm = () => setConfirmDialog({ open: false, type: null, request: null })
+  const proceedConfirm = () => {
+    // Placeholder for future API integration
+    closeConfirm()
+  }
   const [activeTab, setActiveTab] = useState("family-requests")
   const [pendingRequests, setPendingRequests] = useState(mockPendingFamilyRequests)
   const [ongoingRequests, setOngoingRequests] = useState(mockOngoingFamilyRequests)
@@ -514,9 +523,9 @@ export default function AgencyDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   {mockPendingAffiliationRequests.map((request) => (
-                    <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg bg-card hover-lift transition-theme">
+                    <div key={request.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border rounded-lg bg-card hover-lift transition-theme">
                       <div className="flex-1">
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-start sm:items-center gap-4">
                           <UserPlus className="h-5 w-5 text-primary" />
                 <div>
                             <p className="font-medium text-card-foreground">{request.workerName}</p>
@@ -532,15 +541,24 @@ export default function AgencyDashboard() {
                           </div>
                         </div>
                 </div>
-                      <div className="flex items-center gap-2">
-                        <Button size="sm" variant="outline" className="text-destructive border-destructive/20 hover:bg-destructive/10">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto self-start sm:self-auto">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => router.push(`/agency/workers/${request.workerId ?? request.id}`)}
+                          className="w-full sm:w-auto"
+                        >
+                          <Eye className="h-4 w-4 mr-2" />
+                          View Details
+                        </Button>
+                        <Button size="sm" variant="outline" className="w-full sm:w-auto text-destructive border-destructive/20 hover:bg-destructive/10" onClick={() => openConfirm("decline", request)}>
                           <XCircle className="h-4 w-4 mr-2" />
                           Decline
                         </Button>
-                        <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                        <Button size="sm" className="w-full sm:w-auto bg-green-600 hover:bg-green-700" onClick={() => openConfirm("accept", request)}>
                           <CheckCircle className="h-4 w-4 mr-2" />
                           Accept
-                </Button>
+                        </Button>
               </div>
                     </div>
                   ))}
@@ -605,7 +623,7 @@ export default function AgencyDashboard() {
                             <p className="text-xs text-muted-foreground">
                               Created: {contract.createdAt} • Status: {contract.status.replace('_', ' ')}
                             </p>
-                            <div className="flex items-center gap-4 mt-2">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-2">
                               <div className="flex items-center gap-2">
                                 <span className="text-xs text-muted-foreground">Worker:</span>
                                 {contract.workerSigned ? (
@@ -620,7 +638,7 @@ export default function AgencyDashboard() {
                                   </Badge>
                                 )}
                               </div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 sm:ml-4">
                                 <span className="text-xs text-muted-foreground">Employer:</span>
                                 {contract.employerSigned ? (
                                   <Badge variant="default" className="text-xs">
@@ -634,11 +652,23 @@ export default function AgencyDashboard() {
                                   </Badge>
                                 )}
                               </div>
+                              {/* Mobile: View contract under statuses */}
+                              <div className="sm:hidden w-full">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => router.push(`/contracts/${contract.id}?role=agency`)}
+                                  className="mt-2"
+                                >
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  View Contract
+                                </Button>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="hidden sm:flex items-center gap-2">
                         <Button
                           size="sm"
                           variant="outline"
@@ -671,6 +701,30 @@ export default function AgencyDashboard() {
         onDismiss={removeNotification}
         onMarkAsRead={markAsRead}
       />
+
+      {/* Confirmation Dialog for Accept/Decline */}
+      <Dialog open={confirmDialog.open} onOpenChange={(open) => !open && closeConfirm()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {confirmDialog.type === "accept" ? "Accept Affiliation Request" : "Decline Affiliation Request"}
+            </DialogTitle>
+            <DialogDescription>
+              {confirmDialog.type === "accept"
+                ? `Are you sure you want to accept ${confirmDialog.request?.workerName}'s affiliation request?`
+                : `Are you sure you want to decline ${confirmDialog.request?.workerName}'s affiliation request?`}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={closeConfirm}>Cancel</Button>
+            {confirmDialog.type === "accept" ? (
+              <Button className="bg-green-600 hover:bg-green-700" onClick={proceedConfirm}>Confirm Accept</Button>
+            ) : (
+              <Button variant="destructive" onClick={proceedConfirm}>Confirm Decline</Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   )
 }

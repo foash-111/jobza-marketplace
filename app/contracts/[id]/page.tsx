@@ -22,8 +22,7 @@ import {
   User,
   XCircle,
 } from "lucide-react"
-import { WorkerSidebar } from "@/components/layout/worker-sidebar"
-import { EmployerSidebar } from "@/components/layout/employer-sidebar"
+import { UnifiedSidebar } from "@/components/layout/unified-sidebar"
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
 
 // Mock contract data - replace with actual API call
@@ -692,10 +691,14 @@ export default function ContractPage({ params }: { params: { id: string } }) {
 
   // Regular layout for worker and employer
   return (
-    <div className="flex min-h-screenbg-background">
-      {userRole === "employer" ? <EmployerSidebar /> : <WorkerSidebar />}
+    <div className="min-h-screen bg-background">
+      <UnifiedSidebar 
+        userRole={userRole === "employer" ? "employer" : "worker"}
+        userName={userRole === "employer" ? "John Smith" : "Sarah Johnson"}
+        userEmail={userRole === "employer" ? "john@example.com" : "sarah@example.com"}
+      />
 
-      <div className="flex-1 p-6">
+      <div className="lg:ml-64 p-6">
         {/* Header */}
         <div className="flex items-center mb-6">
           <Button variant="ghost" onClick={handleBack} className="mr-4">

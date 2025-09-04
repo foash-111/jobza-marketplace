@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Clock, XCircle, CheckCircle, ArrowLeft, Search, Filter } from "lucide-react"
-import { WorkerSidebar } from "@/components/layout/worker-sidebar"
+import { UnifiedSidebar } from "@/components/layout/unified-sidebar"
 import Link from "next/link"
 
 export default function WorkerApplications() {
@@ -114,11 +114,11 @@ export default function WorkerApplications() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <WorkerSidebar />
+    <div className="min-h-screen bg-background">
+      <UnifiedSidebar userRole="worker" userName="Sarah Johnson" userEmail="sarah@example.com" />
 
-      <div className="flex-1 p-6">
-        <div className="max-w-7xl mx-auto">
+      <div className="lg:ml-64 p-4 sm:p-6">
+        <div className="max-w-7xl mx-auto w-full">
           {/* Header */}
           <div className="mb-6">
             <Link href="/worker/dashboard">
@@ -136,22 +136,22 @@ export default function WorkerApplications() {
 
           {/* Filters */}
           <Card className="mb-6">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
+            <CardContent className="p-4 sm:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="md:col-span-1">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                     <Input
                       placeholder="Search applications..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 w-full"
                     />
                   </div>
                 </div>
-                <div className="flex gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-2 gap-4 md:col-span-2">
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-40">
+                    <SelectTrigger className="w-full">
                       <Filter className="h-4 w-4 mr-2" />
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
@@ -164,7 +164,7 @@ export default function WorkerApplications() {
                     </SelectContent>
                   </Select>
                   <Select value={typeFilter} onValueChange={setTypeFilter}>
-                    <SelectTrigger className="w-40">
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -189,32 +189,34 @@ export default function WorkerApplications() {
                 {filteredApplications.map((application) => (
                   <div
                     key={application.id}
-                    className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border border-border rounded-lg hover:bg-muted transition-colors"
                   >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start sm:items-center gap-4">
                         {getStatusIcon(application.status)}
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <p className="font-medium">{application.title}</p>
                             <Badge variant="outline" className="text-xs">
                               {application.type}
                             </Badge>
                           </div>
-                          <p className="text-sm text-muted-foreground mb-1">
-                            {application.familyName || application.agencyName} • {application.location}
-                          </p>
-                          <p className="text-sm font-medium text-green-600 mb-1">{application.budget}</p>
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <Badge className={`${getStatusColor(application.status)} whitespace-nowrap`}>
+                              {application.status.replace("_", " ")}
+                            </Badge>
+                            <p className="text-sm text-muted-foreground">
+                              {application.familyName || application.agencyName} • {application.location}
+                            </p>
+                            <span className="text-sm font-medium text-green-600">{application.budget}</span>
+                          </div>
                           <p className="text-xs text-muted-foreground mb-2">{application.description}</p>
                           <p className="text-xs text-muted-foreground">Applied: {application.appliedDate}</p>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Badge className={getStatusColor(application.status)}>
-                        {application.status.replace("_", " ")}
-                      </Badge>
-                      <Button size="sm" variant="outline">
+                    <div className="flex items-center gap-3 w-full sm:w-auto sm:justify-end justify-end">
+                      <Button size="sm" variant="outline" className="shrink-0">
                         View Details
                       </Button>
                     </div>

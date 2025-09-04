@@ -522,10 +522,15 @@ export default function ShortTermBookingPage() {
                     <p><span className="font-medium">Specialties:</span> House Cleaning, Laundry</p>
                     <p><span className="font-medium">Rate:</span> EGP 45-60/hour</p>
                   </div>
-                  <Button className="w-full mt-3" size="sm">
-                    <Eye className="w-4 h-4 mr-2" />
-                    View Profile & Select
-                  </Button>
+                  <div className="flex gap-2 mt-3">
+                    <Button variant="outline" className="flex-1" size="sm">
+                      <Eye className="w-4 h-4 mr-2" />
+                      View Profile
+                    </Button>
+                    <Button className="flex-1" size="sm">
+                      Select
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="border rounded-lg p-4 hover:border-blue-300 transition-colors">
@@ -546,10 +551,15 @@ export default function ShortTermBookingPage() {
                     <p><span className="font-medium">Specialties:</span> Deep Cleaning, Organization</p>
                     <p><span className="font-medium">Rate:</span> EGP 50-70/hour</p>
                   </div>
-                  <Button className="w-full mt-3" size="sm">
-                    <Eye className="w-4 h-4 mr-2" />
-                    View Profile & Select
-                  </Button>
+                  <div className="flex gap-2 mt-3">
+                    <Button variant="outline" className="flex-1" size="sm">
+                      <Eye className="w-4 h-4 mr-2" />
+                      View Profile
+                    </Button>
+                    <Button className="flex-1" size="sm">
+                      Select
+                    </Button>
+                  </div>
                 </div>
               </div>
 

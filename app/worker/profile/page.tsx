@@ -30,7 +30,7 @@ import {
   RefreshCw,
   XCircle,
 } from "lucide-react"
-import { WorkerSidebar } from "@/components/layout/worker-sidebar"
+import { UnifiedSidebar } from "@/components/layout/unified-sidebar"
 import Link from "next/link"
 import { SignatureCanvas } from "@/components/ui/signature-canvas"
 
@@ -252,10 +252,10 @@ function WorkerProfileContent() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <WorkerSidebar />
+    <div className="min-h-screen bg-background">
+      <UnifiedSidebar userRole="worker" userName="Sarah Johnson" userEmail="sarah@example.com" />
 
-      <div className="flex-1 p-6">
+      <div className="lg:ml-64 p-6">
         <div className="mb-6">
           <Link href="/worker/dashboard">
             <Button variant="ghost" size="sm">
@@ -1672,9 +1672,9 @@ function WorkerProfileContent() {
 export default function WorkerProfile() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen bg-background">
-        <WorkerSidebar />
-        <div className="flex-1 p-6">
+      <div className="min-h-screen bg-background">
+        <UnifiedSidebar userRole="worker" userName="Sarah Johnson" userEmail="sarah@example.com" />
+        <div className="lg:ml-64 p-6">
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>

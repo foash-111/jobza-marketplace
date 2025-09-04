@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { WorkerSidebar } from "@/components/layout/worker-sidebar"
+import { UnifiedSidebar } from "@/components/layout/unified-sidebar"
 import { SharedHeader } from "@/components/layout/shared-header"
 import { ArrowLeft, MapPin, Clock, DollarSign, Calendar, Search, Plus, CheckCircle, AlertCircle } from "lucide-react"
 import Link from "next/link"
@@ -256,10 +256,10 @@ export default function JobOffersPage() {
   })
 
   return (
-    <div className="flex h-screen bg-background">
-      <WorkerSidebar />
+    <div className="min-h-screen bg-background">
+      <UnifiedSidebar userRole="worker" userName="Sarah Johnson" userEmail="sarah@example.com" />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="lg:ml-64 flex-1 flex flex-col overflow-hidden">
         <SharedHeader 
           title="Job Offers" 
           subtitle="Browse available job opportunities" 

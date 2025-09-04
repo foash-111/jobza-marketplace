@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet"
 import { 
   Home, 
   Briefcase, 
@@ -197,6 +197,10 @@ export function UnifiedSidebar({ userRole, userName, userEmail, userAvatar, onCo
       {/* Mobile Sidebar */}
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <SheetContent side="left" className="flex flex-col w-64 p-0">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Sidebar</SheetTitle>
+            <SheetDescription>Mobile navigation menu</SheetDescription>
+          </SheetHeader>
           <div className="flex flex-col h-full">
             {/* Logo */}
             <div className="flex items-center justify-center h-16 px-4 border-b border-sidebar-border">
@@ -309,7 +313,7 @@ export function UnifiedSidebar({ userRole, userName, userEmail, userAvatar, onCo
       {/* Mobile overlay */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black bg-opacity-50 lg:hidden"
+          className="fixed inset-0 z-30 bg-background/40 backdrop-blur-sm lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}

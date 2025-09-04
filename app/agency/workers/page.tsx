@@ -656,11 +656,11 @@ function AgencyWorkersPageContent() {
                           </div>
                         </div>
                         
-                        <div className="flex space-x-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                           <Button 
                             variant="outline" 
                             size="sm" 
-                            className="flex-1"
+                            className="w-full sm:flex-1"
                             onClick={() => router.push(`/agency/workers/${worker.id}`)}
                           >
                             <Building2 className="h-4 w-4 mr-2" />
@@ -670,7 +670,7 @@ function AgencyWorkersPageContent() {
                           {worker.affiliationStatus === 'none' && (
                             <Button 
                               size="sm" 
-                              className="flex-1"
+                              className="w-full sm:flex-1"
                               onClick={() => handleAffiliateWorker(worker.id)}
                             >
                               <UserPlus className="h-4 w-4 mr-2" />
@@ -682,7 +682,7 @@ function AgencyWorkersPageContent() {
                             <Button 
                               variant="secondary" 
                               size="sm" 
-                              className="flex-1"
+                              className="w-full sm:flex-1"
                               disabled
                             >
                               <Clock className="h-4 w-4 mr-2" />
@@ -691,11 +691,11 @@ function AgencyWorkersPageContent() {
                           )}
                           
                           {worker.affiliationStatus === 'rejected' && (
-                            <div className="flex space-x-2 flex-1">
+                            <div className="flex flex-col sm:flex-row gap-2 flex-1">
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="flex-1"
+                                className="w-full sm:flex-1"
                                 onClick={() => handleAffiliateWorker(worker.id)}
                               >
                                 <UserPlus className="h-4 w-4 mr-2" />
@@ -704,7 +704,7 @@ function AgencyWorkersPageContent() {
                               <Button 
                                 variant="destructive" 
                                 size="sm" 
-                                className="flex-1"
+                                className="w-full sm:flex-1"
                                 onClick={() => handleWorkerResponse(worker.id, 'rejected')}
                               >
                                 Simulate Reject

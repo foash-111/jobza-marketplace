@@ -250,22 +250,25 @@ export default function EmployerDashboard() {
                     <CardContent>
                       <div className="space-y-4">
                         {shortTermApplications.slice(0, 3).map((app) => (
-                          <div key={app.id} className="flex items-center justify-between p-3 border rounded-lg">
-                            <div className="flex items-center gap-3">
-                              <Users className="h-4 w-4 text-gray-500" />
+                          <div key={app.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border rounded-lg">
+                            <div className="flex items-start sm:items-center gap-4">
+                              <Users className="h-5 w-5 text-pink-600" />
                               <div>
                                 <p className="font-medium">{app.workerName}</p>
                                 <p className="text-sm text-gray-600">{app.jobTitle}</p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 w-full sm:w-auto">
                               <Badge variant={app.status === "pending" ? "secondary" : "default"}>{app.status}</Badge>
-                              {app.status === "accepted" && (
-                                <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => router.push('/messages')}>
-                                  Contact
+                              <div className="sm:hidden w-full">
+                                <Button size="sm" onClick={() => handleViewDetails(app)} className="w-full">
+                                  <Eye className="h-3 w-3 mr-1" />
+                                  View Details
                                 </Button>
-                              )}
-                              <Button size="sm" variant="outline" onClick={() => handleViewDetails(app)}>
+                              </div>
+                            </div>
+                            <div className="hidden sm:flex items-center gap-2">
+                              <Button size="sm" onClick={() => handleViewDetails(app)}>
                                 <Eye className="h-3 w-3 mr-1" />
                                 View Details
                               </Button>
@@ -287,22 +290,25 @@ export default function EmployerDashboard() {
                     <CardContent>
                       <div className="space-y-4">
                         {longTermApplications.map((app) => (
-                          <div key={app.id} className="flex items-center justify-between p-3 border rounded-lg">
-                            <div className="flex items-center gap-3">
-                              <Building2 className="h-4 w-4 text-gray-500" />
+                          <div key={app.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border rounded-lg">
+                            <div className="flex items-start sm:items-center gap-4">
+                              <Building2 className="h-5 w-5 text-blue-600" />
                               <div>
                                 <p className="font-medium">{app.agencyName}</p>
                                 <p className="text-sm text-gray-600">{app.jobTitle}</p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 w-full sm:w-auto">
                               <Badge variant={app.status === "pending" ? "secondary" : "default"}>{app.status}</Badge>
-                              {app.status === "accepted" && (
-                                <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => router.push('/messages')}>
-                                  Contact
+                              <div className="sm:hidden w-full">
+                                <Button size="sm" onClick={() => handleViewDetails(app)} className="w-full">
+                                  <Eye className="h-3 w-3 mr-1" />
+                                  View Details
                                 </Button>
-                              )}
-                              <Button size="sm" variant="outline" onClick={() => handleViewDetails(app)}>
+                              </div>
+                            </div>
+                            <div className="hidden sm:flex items-center gap-2">
+                              <Button size="sm" onClick={() => handleViewDetails(app)}>
                                 <Eye className="h-3 w-3 mr-1" />
                                 View Details
                               </Button>
@@ -348,9 +354,9 @@ export default function EmployerDashboard() {
                         {[...shortTermApplications, ...longTermApplications].map((app) => (
                           <div
                             key={`${app.type}-${app.id}`}
-                            className="flex items-center justify-between p-4 border rounded-lg"
+                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border rounded-lg"
                           >
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-start sm:items-center gap-4">
                               {app.type === "worker" ? (
                                 <Users className="h-5 w-5 text-pink-600" />
                               ) : (
@@ -365,8 +371,21 @@ export default function EmployerDashboard() {
                                 </Badge>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 w-full sm:w-auto">
                               <Badge variant={app.status === "pending" ? "secondary" : "default"}>{app.status}</Badge>
+                              {app.status === "accepted" && (
+                                <Button size="sm" className="hidden sm:inline-flex bg-blue-600 hover:bg-blue-700" onClick={() => router.push('/messages')}>
+                                  Contact
+                                </Button>
+                              )}
+                              <div className="sm:hidden w-full">
+                                <Button size="sm" onClick={() => handleViewDetails(app)} className="w-full">
+                                  <Eye className="h-3 w-3 mr-1" />
+                                  View Details
+                                </Button>
+                              </div>
+                            </div>
+                            <div className="hidden sm:flex items-center gap-2">
                               {app.status === "accepted" && (
                                 <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => router.push('/messages')}>
                                   Contact
@@ -383,8 +402,8 @@ export default function EmployerDashboard() {
 
                       <TabsContent value="long-term" className="space-y-4">
                         {longTermApplications.map((app) => (
-                          <div key={app.id} className="flex items-center justify-between p-4 border rounded-lg">
-                            <div className="flex items-center gap-4">
+                          <div key={app.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border rounded-lg">
+                            <div className="flex items-start sm:items-center gap-4">
                               <Building2 className="h-5 w-5 text-blue-600" />
                               <div>
                                 <p className="font-medium">{app.agencyName}</p>
@@ -392,8 +411,16 @@ export default function EmployerDashboard() {
                                 <p className="text-xs text-gray-500">Applied: {app.appliedDate}</p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 w-full sm:w-auto">
                               <Badge variant={app.status === "pending" ? "secondary" : "default"}>{app.status}</Badge>
+                              <div className="sm:hidden w-full">
+                                <Button size="sm" onClick={() => handleViewDetails(app)} className="w-full">
+                                  <Eye className="h-3 w-3 mr-1" />
+                                  View Details
+                                </Button>
+                              </div>
+                            </div>
+                            <div className="hidden sm:flex items-center gap-2">
                               <Button size="sm" onClick={() => handleViewDetails(app)}>
                                 <Eye className="h-3 w-3 mr-1" />
                                 View Details
@@ -405,8 +432,8 @@ export default function EmployerDashboard() {
 
                       <TabsContent value="short-term" className="space-y-4">
                         {shortTermApplications.map((app) => (
-                          <div key={app.id} className="flex items-center justify-between p-4 border rounded-lg">
-                            <div className="flex items-center gap-4">
+                          <div key={app.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border rounded-lg">
+                            <div className="flex items-start sm:items-center gap-4">
                               <Users className="h-5 w-5 text-pink-600" />
                               <div>
                                 <p className="font-medium">{app.workerName}</p>
@@ -414,8 +441,18 @@ export default function EmployerDashboard() {
                                 <p className="text-xs text-gray-500">Applied: {app.appliedDate}</p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Badge variant={app.status === "pending" ? "secondary" : "default"}>{app.status}</Badge>
+                            <div className="flex items-center sm:items-center gap-2 sm:justify-end w-full sm:w-auto">
+                              <div className="flex items-center gap-2">
+                                <Badge variant={app.status === "pending" ? "secondary" : "default"}>{app.status}</Badge>
+                              </div>
+                              <div className="sm:hidden w-full">
+                                <Button size="sm" onClick={() => handleViewDetails(app)} className="w-full">
+                                  <Eye className="h-3 w-3 mr-1" />
+                                  View Details
+                                </Button>
+                              </div>
+                            </div>
+                            <div className="hidden sm:flex items-center gap-2">
                               <Button size="sm" onClick={() => handleViewDetails(app)}>
                                 <Eye className="h-3 w-3 mr-1" />
                                 View Details
@@ -488,8 +525,8 @@ export default function EmployerDashboard() {
                   <CardContent>
                     <div className="space-y-4">
                       {jobPostsHistory.map((job) => (
-                        <div key={job.id} className="flex items-center justify-between p-4 border rounded-lg">
-                          <div className="flex items-center gap-4">
+                        <div key={job.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border rounded-lg">
+                          <div className="flex items-start sm:items-center gap-4">
                             {job.type === "short-term" ? (
                               <Clock className="h-5 w-5 text-pink-600" />
                             ) : (
@@ -498,21 +535,32 @@ export default function EmployerDashboard() {
                             <div>
                               <p className="font-medium">{job.title}</p>
                               <p className="text-sm text-gray-600">{job.salary}</p>
-                              <div className="flex items-center gap-4 mt-1">
-                                <p className="text-xs text-gray-500">Posted: {job.postedDate}</p>
+                              <p className="text-xs text-gray-500 mt-1">Posted: {job.postedDate}</p>
+                              <div className="flex items-center gap-2 mt-1">
                                 <Badge variant="outline">
                                   {job.type === "short-term" ? "Short-term" : "Long-term"}
                                 </Badge>
+                                <span className="text-xs text-gray-500">-</span>
                                 <Badge variant={job.status === "active" ? "default" : "secondary"}>{job.status}</Badge>
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="hidden sm:flex items-center gap-2">
                             <div className="flex items-center gap-1 text-sm text-gray-600 mr-4">
                               <Users className="h-4 w-4" />
                               {job.applicants} applicants
                             </div>
                             <Button size="sm" variant="outline" onClick={() => handleViewJobPost(job.id)}>
+                              <Eye className="h-3 w-3 mr-1" />
+                              View
+                            </Button>
+                          </div>
+                          <div className="sm:hidden mt-1 space-y-2">
+                            <div className="flex items-center gap-1 text-sm text-gray-600">
+                              <Users className="h-4 w-4" />
+                              {job.applicants} applicants
+                            </div>
+                            <Button size="sm" variant="outline" className="w-full" onClick={() => handleViewJobPost(job.id)}>
                               <Eye className="h-3 w-3 mr-1" />
                               View
                             </Button>
@@ -536,15 +584,15 @@ export default function EmployerDashboard() {
                   <CardContent>
                     <div className="space-y-4">
                       {incomingContracts.map((contract) => (
-                        <div key={contract.id} className="flex items-center justify-between p-4 border rounded-lg">
-                          <div className="flex items-center gap-4">
+                        <div key={contract.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border rounded-lg">
+                          <div className="flex items-start sm:items-center gap-4">
                             <Calendar className="h-5 w-5 text-blue-600" />
                             <div>
                               <p className="font-medium">{contract.position}</p>
                               <p className="text-sm text-gray-600">
                                 {contract.agencyName} • {contract.workerName}
                               </p>
-                              <div className="flex items-center gap-4 mt-1">
+                              <div className="flex flex-wrap items-center gap-4 mt-1">
                                 <p className="text-xs text-gray-500">Created: {contract.createdAt}</p>
                                 <p className="text-xs text-gray-500">Start: {contract.startDate}</p>
                                 <Badge variant="outline">
@@ -556,12 +604,23 @@ export default function EmployerDashboard() {
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="hidden sm:flex items-center gap-2">
                             <div className="text-right mr-4">
                               <p className="text-sm font-medium text-green-600">{contract.salary}</p>
                               <p className="text-xs text-gray-500">Contract ID: {contract.contractId}</p>
                             </div>
                             <Button size="sm" variant="outline" onClick={() => router.push(`/contracts/${contract.id}?role=employer`)}>
+                              <Eye className="h-3 w-3 mr-1" />
+                              View & Sign
+                            </Button>
+                          </div>
+                          {/* Mobile: move salary/id and action below */}
+                          <div className="sm:hidden mt-2 space-y-2">
+                            <div className="text-sm text-gray-700">
+                              <p className="font-medium text-green-600">{contract.salary}</p>
+                              <p className="text-xs text-gray-500">Contract ID: {contract.contractId}</p>
+                            </div>
+                            <Button size="sm" variant="outline" className="w-full" onClick={() => router.push(`/contracts/${contract.id}?role=employer`)}>
                               <Eye className="h-3 w-3 mr-1" />
                               View & Sign
                             </Button>
@@ -593,8 +652,8 @@ export default function EmployerDashboard() {
                   <CardContent>
                     <div className="space-y-4">
                       {(primaryAgencyId ? primaryAgencies.filter(a => a.id === primaryAgencyId) : primaryAgencies).map((agency) => (
-                        <div key={agency.id} className="flex items-center justify-between p-4 border rounded-lg">
-                          <div className="flex items-center gap-4">
+                        <div key={agency.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border rounded-lg">
+                          <div className="flex items-start sm:items-center gap-4">
                             <Building2 className="h-5 w-5 text-blue-600" />
                             <div>
                               <p className="font-medium">{agency.name}</p>
@@ -615,7 +674,7 @@ export default function EmployerDashboard() {
                               </div>
                             </div>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="hidden sm:flex gap-2">
                             <Button size="sm" variant="outline" onClick={() => router.push("/agency/profile")}>
                               <Eye className="h-3 w-3 mr-1" />
                               View Profile
@@ -623,6 +682,19 @@ export default function EmployerDashboard() {
                             <Button size="sm">Contact</Button>
                             {primaryAgencyId !== agency.id && (
                               <Button size="sm" variant="secondary" onClick={() => handleSetPrimaryAgency(agency.id)}>
+                                Set as Primary Agency
+                              </Button>
+                            )}
+                          </div>
+                          {/* Mobile actions below */}
+                          <div className="sm:hidden mt-2 grid grid-cols-2 gap-2 w-full">
+                            <Button size="sm" variant="outline" onClick={() => router.push("/agency/profile")}>
+                              <Eye className="h-3 w-3 mr-1" />
+                              View Profile
+                            </Button>
+                            <Button size="sm">Contact</Button>
+                            {primaryAgencyId !== agency.id && (
+                              <Button size="sm" variant="secondary" className="col-span-2" onClick={() => handleSetPrimaryAgency(agency.id)}>
                                 Set as Primary Agency
                               </Button>
                             )}
