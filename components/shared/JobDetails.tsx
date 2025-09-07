@@ -62,12 +62,12 @@ export function JobDetails({ job, audience, getTypeBadgeClass, getStatusBadgeCla
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-2xl">{title}</CardTitle>
-              {subtitle && <CardDescription className="text-lg">{subtitle}</CardDescription>}
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-xl sm:text-2xl break-words">{title}</CardTitle>
+              {subtitle && <CardDescription className="text-base sm:text-lg break-words">{subtitle}</CardDescription>}
               {(job.type || job.status) && (
-                <div className="flex items-center gap-2 mt-2">
+                <div className="flex flex-wrap items-center gap-2 mt-2">
                   {job.type && (
                     <Badge className={getTypeBadgeClass ? getTypeBadgeClass(job.type) : ""}>
                       {job.type === "long-term" ? "Long-term" : job.type}
@@ -80,31 +80,31 @@ export function JobDetails({ job, audience, getTypeBadgeClass, getStatusBadgeCla
               )}
             </div>
             {money && (
-              <div className="text-right">
+              <div className="flex flex-col sm:text-right">
                 <div className="text-sm text-muted-foreground">{job.salary ? "Salary" : "Budget"}</div>
-                <div className="text-lg font-semibold">{money}</div>
+                <div className="text-lg font-semibold break-words">{money}</div>
               </div>
             )}
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             {location && (
               <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">{location}</span>
+                <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="text-sm text-muted-foreground truncate">{location}</span>
               </div>
             )}
             {money && (
               <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">{money}</span>
+                <DollarSign className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="text-sm text-muted-foreground truncate">{money}</span>
               </div>
             )}
             {dateLabel && (
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">{dateLabel}</span>
+              <div className="flex items-center gap-2 sm:col-span-2 lg:col-span-1">
+                <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="text-sm text-muted-foreground truncate">{dateLabel}</span>
               </div>
             )}
           </div>

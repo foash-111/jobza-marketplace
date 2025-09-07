@@ -353,16 +353,16 @@ export default function JobPostDetailPage() {
         <div className="max-w-6xl mx-auto">
           {/* Job Post Header */}
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-            <div className="flex items-start justify-between mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
               <div className="flex items-center space-x-3">
                 {jobPost.type === "long-term" ? (
                   <Calendar className="w-8 h-8 text-blue-600" />
                 ) : (
                   <Clock className="w-8 h-8 text-pink-600" />
                 )}
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900">{jobPost.title}</h1>
-                  <div className="flex items-center space-x-2 mt-2">
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 break-words">{jobPost.title}</h1>
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
                     <Badge className={getTypeColor(jobPost.type)}>
                       {jobPost.type === "long-term" ? "Long-term" : "Short-term"}
                     </Badge>
@@ -372,24 +372,24 @@ export default function JobPostDetailPage() {
                   </div>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-2xl font-bold text-green-600">{jobPost.salary}</p>
+              <div className="flex flex-col sm:text-right">
+                <p className="text-xl sm:text-2xl font-bold text-green-600 break-words">{jobPost.salary}</p>
                 <p className="text-sm text-gray-600">Posted: {jobPost.postedDate}</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               <div className="flex items-center space-x-2">
-                <Users className="w-5 h-5 text-gray-500" />
-                <span className="text-gray-600">{jobPost.applicants} applicants</span>
+                <Users className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                <span className="text-gray-600 truncate">{jobPost.applicants} applicants</span>
               </div>
               <div className="flex items-center space-x-2">
-                <MapPin className="w-5 h-5 text-gray-500" />
-                <span className="text-gray-600">{jobPost.location}</span>
+                <MapPin className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                <span className="text-gray-600 truncate">{jobPost.location}</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <ClockIcon className="w-5 h-5 text-gray-500" />
-                <span className="text-gray-600">{jobPost.schedule}</span>
+              <div className="flex items-center space-x-2 sm:col-span-2 lg:col-span-1">
+                <ClockIcon className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                <span className="text-gray-600 truncate">{jobPost.schedule}</span>
               </div>
             </div>
           </div>

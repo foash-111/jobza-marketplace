@@ -47,18 +47,18 @@ export function ApplicantsList({
   return (
     <div className="space-y-4">
       {sortApplications(applications).map((app) => (
-        <div key={app.id} className="border rounded-lg p-6">
-          <div className="flex items-start justify-between mb-4">
+        <div key={app.id} className="border rounded-lg p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
             <div className="flex items-center space-x-4">
-              <Avatar className="w-16 h-16">
+              <Avatar className="w-16 h-16 flex-shrink-0">
                 <AvatarImage src={app.workerAvatar} alt={app.workerName} />
                 <AvatarFallback className="text-xl font-semibold">
                   {app.workerName.split(" ").map((n) => n[0]).join("")}
                 </AvatarFallback>
               </Avatar>
-              <div>
-                <h3 className="text-lg font-semibold">{app.workerName}</h3>
-                <div className="flex items-center space-x-2 mt-1">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-lg font-semibold break-words">{app.workerName}</h3>
+                <div className="flex flex-wrap items-center gap-2 mt-1">
                   {typeof app.rating !== "undefined" && (
                     <>
                       <Star className="w-4 h-4 text-yellow-500 fill-current" />
@@ -70,14 +70,14 @@ export function ApplicantsList({
                   )}
                 </div>
                 {app.location && (
-                  <p className="text-sm text-gray-600 mt-1">{app.location}</p>
+                  <p className="text-sm text-gray-600 mt-1 break-words">{app.location}</p>
                 )}
               </div>
             </div>
             <Badge className={getStatusBadgeClass(app.status)}>{app.status}</Badge>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div>
               <h4 className="font-medium mb-2">Skills</h4>
               <div className="flex flex-wrap gap-1">
@@ -100,28 +100,35 @@ export function ApplicantsList({
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t">
             <div className="text-sm text-gray-600">Applied: {app.appliedDate}</div>
-            <div className="flex space-x-2">
-              {showViewProfileButton && (
-                <Button size="sm" variant="outline">
-                  <Eye className="w-4 h-4 mr-2" />
-                  View Profile
-                </Button>
-              )}
-              {onAction && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onAction(app.id, "short_list")}
-                >
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Short List
-                </Button>
-              )}
+            <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex flex-wrap gap-2">
+                {showViewProfileButton && (
+                  <Button size="sm" variant="outline" className="flex-1 sm:flex-none">
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Profile
+                  </Button>
+                )}
+                {onAction && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => onAction(app.id, "short_list")}
+                    className="flex-1 sm:flex-none"
+                  >
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Short List
+                  </Button>
+                )}
+              </div>
               {onAction && app.status === "pending" && (
-                <>
-                  <Button size="sm" onClick={() => onAction(app.id, "accept")} className="bg-green-600 hover:bg-green-700">
+                <div className="flex gap-2">
+                  <Button 
+                    size="sm" 
+                    onClick={() => onAction(app.id, "accept")} 
+                    className="bg-green-600 hover:bg-green-700 flex-1 sm:flex-none"
+                  >
                     <CheckCircle className="w-4 h-4 mr-2" />
                     Accept
                   </Button>
@@ -129,12 +136,12 @@ export function ApplicantsList({
                     size="sm"
                     variant="outline"
                     onClick={() => onAction(app.id, "reject")}
-                    className="text-red-600 hover:text-red-700"
+                    className="text-red-600 hover:text-red-700 flex-1 sm:flex-none"
                   >
                     <XCircle className="w-4 h-4 mr-2" />
                     Reject
                   </Button>
-                </>
+                </div>
               )}
             </div>
           </div>

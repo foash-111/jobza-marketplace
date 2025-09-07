@@ -67,7 +67,8 @@ export function AssignedWorkersTab({ assignedWorkers, onProceedContract }: Assig
                       </Badge>
 
                       {onProceedContract && worker.status === 'accepted' && (
-                        <Button size="sm" onClick={() => onProceedContract(worker.id)} className="w-full sm:w-auto">
+                        <Button size="sm" onClick={
+                          () => onProceedContract(worker.id)} className="w-full sm:w-auto">
                           Proceed with Contract
                         </Button>
                       )}
