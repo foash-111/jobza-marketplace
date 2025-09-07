@@ -1,0 +1,1126 @@
+This is a Demo, Join Care Comm-Unity WhatsApp/Telegram Group (+201501325314) for update on launch date.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Opportunities - Care Comm-unity</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2972FF',
+                        accent: '#FF4DA6',
+                        success: '#22C55E',
+                        warning: '#FACC15',
+                        error: '#EF4444',
+                        darkText: '#2A2A2A',
+                        mutedText: '#6B7280',
+                        lightGray: '#F3F4F6',
+                        borderGray: '#E5E7EB'
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', 'sans-serif']
+                    },
+                    borderRadius: {
+                        'xl': '0.75rem'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .card {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .status-chip {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .job-post {
+            transition: all 0.3s ease;
+        }
+        .job-post:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .priority-high {
+            border-left: 4px solid #EF4444;
+        }
+        .priority-medium {
+            border-left: 4px solid #FACC15;
+        }
+        .priority-low {
+            border-left: 4px solid #22C55E;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 20px 0 30px 0;
+        }
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 14px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #E5E7EB;
+            z-index: 1;
+        }
+        .step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
+        }
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #E5E7EB;
+            color: #6B7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: 600;
+        }
+        .step.active .step-number {
+            background-color: #2972FF;
+            color: white;
+        }
+        .step.completed .step-number {
+            background-color: #22C55E;
+            color: white;
+        }
+        .step.completed .step-number::after {
+            content: '✓';
+        }
+        .step-label {
+            font-size: 0.75rem;
+            color: #6B7280;
+        }
+        .step.active .step-label {
+            color: #2972FF;
+            font-weight: 500;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #2A2A2A;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.5rem;
+            font-family: 'Poppins', sans-serif;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #2972FF;
+            box-shadow: 0 0 0 3px rgba(41, 114, 255, 0.1);
+        }
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #E5E7EB;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background-color: #2972FF;
+            transition: width 0.3s ease;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 0.75rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .application-card {
+            border: 2px dashed #E5E7EB;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .application-card:hover {
+            border-color: #2972FF;
+            background-color: rgba(41, 114, 255, 0.02);
+        }
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+        }
+        .menu-panel {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            z-index: 60;
+            transition: left 0.3s ease;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+        .menu-panel.active {
+            left: 0;
+        }
+        @media (max-width: 768px) {
+            .step-label {
+                font-size: 0.6rem;
+            }
+            .step-number {
+                width: 25px;
+                height: 25px;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body class="font-poppins bg-lightGray text-darkText">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-white shadow-md py-4 px-4 md:px-6 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <button class="text-darkText mr-2 md:mr-4" id="menuToggle">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <div class="flex items-center">
+                <i class="fas fa-hands-helping text-primary text-2xl mr-2"></i>
+                <span class="text-xl font-bold">Care Comm-unity</span>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-4 md:space-x-6">
+            <button class="relative text-darkText hover:text-primary">
+                <i class="fas fa-bell text-xl"></i>
+                <span class="absolute -top-1 -right-1 bg-accent text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+            </button>
+            <div class="relative group">
+                <button class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <i class="fas fa-chevron-down text-xs hidden md:block"></i>
+                </button>
+                <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block z-10">
+                    <a href="#" class="block px-4 py-2 text-darkText hover:bg-lightGray">Profile</a>
+                    <a href="#" class="block px-4 py-2 text-darkText hover:bg-lightGray">Settings</a>
+                    <a href="#" class="block px-4 py-2 text-darkText hover:bg-lightGray">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- Menu Panel -->
+    <div class="menu-panel" id="menuPanel">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-8">
+                <div class="flex items-center">
+                    <i class="fas fa-hands-helping text-primary text-xl mr-2"></i>
+                    <span class="text-lg font-bold">Care Comm-unity</span>
+                </div>
+                <button class="text-mutedText" id="closeMenu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <nav class="space-y-2 mb-8">
+                <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-primary font-medium bg-primary bg-opacity-10">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Job Opportunities</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-darkText hover:text-primary hover:bg-lightGray">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Interviews</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-darkText hover:text-primary hover:bg-lightGray">
+                    <i class="fas fa-file-alt"></i>
+                    <span>My Applications</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-darkText hover:text-primary hover:bg-lightGray">
+                    <i class="fas fa-star"></i>
+                    <span>Saved Jobs</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-darkText hover:text-primary hover:bg-lightGray">
+                    <i class="fas fa-bell"></i>
+                    <span>Alerts</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-darkText hover:text-primary hover:bg-lightGray">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            
+            <!-- Worker Stats -->
+            <div class="card p-4">
+                <h3 class="font-bold mb-3">Your Profile</h3>
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-mutedText text-xs">Applications</p>
+                        <p class="font-bold">12</p>
+                    </div>
+                    <div>
+                        <p class="text-mutedText text-xs">Active Applications</p>
+                        <p class="font-bold">3</p>
+                    </div>
+                    <div>
+                        <p class="text-mutedText text-xs">Success Rate</p>
+                        <p class="font-bold text-success">85%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="p-4 md:p-6">
+        <!-- Welcome Section -->
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold">Job Opportunities</h1>
+                <p class="text-mutedText">Find your next caring opportunity</p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <select class="border border-borderGray rounded-lg px-3 py-2 text-sm">
+                    <option>All Regions</option>
+                    <option>Downtown</option>
+                    <option>Suburbs</option>
+                    <option>Uptown</option>
+                    <option>Westside</option>
+                </select>
+                <select class="border border-borderGray rounded-lg px-3 py-2 text-sm">
+                    <option>All Types</option>
+                    <option>Live-in</option>
+                    <option>Live-out</option>
+                    <option>Part-time</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="card p-4">
+                <div class="flex items-center">
+                    <div class="p-2 bg-primary bg-opacity-10 rounded-lg mr-3">
+                        <i class="fas fa-briefcase text-primary"></i>
+                    </div>
+                    <div>
+                        <p class="text-mutedText text-xs">Total Jobs</p>
+                        <p class="text-lg font-bold">42</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card p-4">
+                <div class="flex items-center">
+                    <div class="p-2 bg-success bg-opacity-10 rounded-lg mr-3">
+                        <i class="fas fa-check-circle text-success"></i>
+                    </div>
+                    <div>
+                        <p class="text-mutedText text-xs">New This Week</p>
+                        <p class="text-lg font-bold">8</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card p-4">
+                <div class="flex items-center">
+                    <div class="p-2 bg-warning bg-opacity-10 rounded-lg mr-3">
+                        <i class="fas fa-clock text-warning"></i>
+                    </div>
+                    <div>
+                        <p class="text-mutedText text-xs">Urgent Hires</p>
+                        <p class="text-lg font-bold">3</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card p-4">
+                <div class="flex items-center">
+                    <div class="p-2 bg-accent bg-opacity-10 rounded-lg mr-3">
+                        <i class="fas fa-star text-accent"></i>
+                    </div>
+                    <div>
+                        <p class="text-mutedText text-xs">Premium Jobs</p>
+                        <p class="text-lg font-bold">15</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Posts Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Job Post 1 -->
+            <div class="job-post card p-5 priority-high">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <h3 class="font-bold text-lg">Live-in Caregiver</h3>
+                        <p class="text-mutedText text-sm">Anderson Family • Downtown</p>
+                    </div>
+                    <span class="status-chip bg-error bg-opacity-20 text-error">High Priority</span>
+                </div>
+                
+                <div class="flex items-center text-sm text-mutedText mb-3">
+                    <i class="fas fa-user mr-2"></i>
+                    <span>Senior Citizen</span>
+                </div>
+                
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <p class="text-sm font-medium">Caregiver</p>
+                        <p class="text-xs text-mutedText">Live-in, Full-time</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-medium">$1,550/month</p>
+                        <p class="text-xs text-mutedText">Starts Aug 1</p>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <button class="flex-1 border border-borderGray text-darkText py-2 rounded-lg text-sm" onclick="viewJobDetails('anderson')">
+                        <i class="fas fa-eye mr-1"></i> View
+                    </button>
+                    <button class="flex-1 bg-primary text-white py-2 rounded-lg text-sm" onclick="applyForJob('anderson')">
+                        <i class="fas fa-paper-plane mr-1"></i> Apply
+                    </button>
+                </div>
+            </div>
+
+            <!-- Job Post 2 -->
+            <div class="job-post card p-5 priority-medium">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <h3 class="font-bold text-lg">Part-time Nanny</h3>
+                        <p class="text-mutedText text-sm">Johnson Family • Suburbs</p>
+                    </div>
+                    <span class="status-chip bg-warning bg-opacity-20 text-warning">Medium</span>
+                </div>
+                
+                <div class="flex items-center text-sm text-mutedText mb-3">
+                    <i class="fas fa-user mr-2"></i>
+                    <span>Working Couple</span>
+                </div>
+                
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <p class="text-sm font-medium">Nanny</p>
+                        <p class="text-xs text-mutedText">Part-time (20 hrs/week)</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-medium">$300/week</p>
+                        <p class="text-xs text-mutedText">Starts Aug 5</p>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <button class="flex-1 border border-borderGray text-darkText py-2 rounded-lg text-sm" onclick="viewJobDetails('johnson')">
+                        <i class="fas fa-eye mr-1"></i> View
+                    </button>
+                    <button class="flex-1 bg-primary text-white py-2 rounded-lg text-sm" onclick="applyForJob('johnson')">
+                        <i class="fas fa-paper-plane mr-1"></i> Apply
+                    </button>
+                </div>
+            </div>
+
+            <!-- Job Post 3 -->
+            <div class="job-post card p-5 priority-low">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <h3 class="font-bold text-lg">Experienced Cook</h3>
+                        <p class="text-mutedText text-sm">Williams Family • Uptown</p>
+                    </div>
+                    <span class="status-chip bg-success bg-opacity-20 text-success">Low</span>
+                </div>
+                
+                <div class="flex items-center text-sm text-mutedText mb-3">
+                    <i class="fas fa-user mr-2"></i>
+                    <span>Elderly Couple</span>
+                </div>
+                
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <p class="text-sm font-medium">Cook</p>
+                        <p class="text-xs text-mutedText">Full-time, Live-in</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-medium">$1,500/month</p>
+                        <p class="text-xs text-mutedText">Starts Aug 10</p>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <button class="flex-1 border border-borderGray text-darkText py-2 rounded-lg text-sm" onclick="viewJobDetails('williams')">
+                        <i class="fas fa-eye mr-1"></i> View
+                    </button>
+                    <button class="flex-1 bg-primary text-white py-2 rounded-lg text-sm" onclick="applyForJob('williams')">
+                        <i class="fas fa-paper-plane mr-1"></i> Apply
+                    </button>
+                </div>
+            </div>
+
+            <!-- Job Post 4 -->
+            <div class="job-post card p-5 priority-high">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <h3 class="font-bold text-lg">Live-in Driver</h3>
+                        <p class="text-mutedText text-sm">Thompson Family • Westside</p>
+                    </div>
+                    <span class="status-chip bg-error bg-opacity-20 text-error">High Priority</span>
+                </div>
+                
+                <div class="flex items-center text-sm text-mutedText mb-3">
+                    <i class="fas fa-user mr-2"></i>
+                    <span>Senior Citizen</span>
+                </div>
+                
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <p class="text-sm font-medium">Driver</p>
+                        <p class="text-xs text-mutedText">Full-time, Live-in</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-medium">$1,450/month</p>
+                        <p class="text-xs text-mutedText">Starts Jul 30</p>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <button class="flex-1 border border-borderGray text-darkText py-2 rounded-lg text-sm" onclick="viewJobDetails('thompson')">
+                        <i class="fas fa-eye mr-1"></i> View
+                    </button>
+                    <button class="flex-1 bg-primary text-white py-2 rounded-lg text-sm" onclick="applyForJob('thompson')">
+                        <i class="fas fa-paper-plane mr-1"></i> Apply
+                    </button>
+                </div>
+            </div>
+
+            <!-- Job Post 5 -->
+            <div class="job-post card p-5 priority-medium">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <h3 class="font-bold text-lg">Housekeeper</h3>
+                        <p class="text-mutedText text-sm">Davis Family • East End</p>
+                    </div>
+                    <span class="status-chip bg-warning bg-opacity-20 text-warning">Medium</span>
+                </div>
+                
+                <div class="flex items-center text-sm text-mutedText mb-3">
+                    <i class="fas fa-user mr-2"></i>
+                    <span>Family of 3</span>
+                </div>
+                
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <p class="text-sm font-medium">Housekeeper</p>
+                        <p class="text-xs text-mutedText">Live-out, 5 days/week</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-medium">$1,280/month</p>
+                        <p class="text-xs text-mutedText">Starts Aug 15</p>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <button class="flex-1 border border-borderGray text-darkText py-2 rounded-lg text-sm" onclick="viewJobDetails('davis')">
+                        <i class="fas fa-eye mr-1"></i> View
+                    </button>
+                    <button class="flex-1 bg-primary text-white py-2 rounded-lg text-sm" onclick="applyForJob('davis')">
+                        <i class="fas fa-paper-plane mr-1"></i> Apply
+                    </button>
+                </div>
+            </div>
+
+            <!-- Job Post 6 -->
+            <div class="job-post card p-5 border-2 border-dashed border-borderGray flex items-center justify-center">
+                <div class="text-center">
+                    <i class="fas fa-sync text-primary text-3xl mb-2"></i>
+                    <p class="font-medium">More Jobs Loading</p>
+                    <p class="text-sm text-mutedText mt-1">Check back soon for new opportunities</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center mt-8 pt-6 border-t border-borderGray">
+            <p class="text-mutedText text-sm mb-4 md:mb-0">Showing 1 to 6 of 42 job opportunities</p>
+            <div class="flex space-x-2">
+                <button class="border border-borderGray rounded-lg px-4 py-2 text-sm disabled opacity-50">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="border border-borderGray rounded-lg px-4 py-2 text-sm bg-primary text-white">1</button>
+                <button class="border border-borderGray rounded-lg px-4 py-2 text-sm">2</button>
+                <button class="border border-borderGray rounded-lg px-4 py-2 text-sm">3</button>
+                <button class="border border-borderGray rounded-lg px-4 py-2 text-sm">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Details Modal -->
+    <div class="modal" id="jobDetailsModal">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Job Details</h3>
+                <button class="text-mutedText" onclick="closeModal('jobDetailsModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4" id="jobDetailsContent">
+                <!-- Job details will be populated here -->
+            </div>
+            
+            <div class="flex justify-end gap-3 pt-6 border-t border-borderGray mt-6">
+                <button class="border border-borderGray text-darkText px-6 py-2 rounded-lg" onclick="closeModal('jobDetailsModal')">
+                    Close
+                </button>
+                <button class="bg-primary text-white px-6 py-2 rounded-lg" onclick="applyForJobFromModal()">
+                    Apply Now
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Flow Modal -->
+    <div class="modal" id="applicationModal">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Apply for Position</h3>
+                <button class="text-mutedText" onclick="closeModal('applicationModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="progress-bar">
+                <div class="progress-fill" id="appProgressFill" style="width: 25%"></div>
+            </div>
+            
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step active" id="appStep1Indicator">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Profile</div>
+                </div>
+                <div class="step" id="appStep2Indicator">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Documents</div>
+                </div>
+                <div class="step" id="appStep3Indicator">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Experience</div>
+                </div>
+                <div class="step" id="appStep4Indicator">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Submit</div>
+                </div>
+            </div>
+            
+            <!-- Application Steps -->
+            <div class="step-content" id="appStep1">
+                <h4 class="font-bold mb-4">Personal Information</h4>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-input" value="Maria Rodriguez" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" class="form-input" value="(555) 123-4567">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" value="maria.rodriguez@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">National ID</label>
+                        <input type="text" class="form-input" value="ID-789456123">
+                    </div>
+                </div>
+                
+                <div class="form-group mb-6">
+                    <label class="form-label">About Yourself</label>
+                    <textarea class="form-textarea" rows="3" placeholder="Tell us about your experience and why you're a good fit...">Experienced caregiver with 7 years in domestic work. Specialized in senior care and household management. Fluent in English and Spanish.</textarea>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button class="bg-primary text-white px-6 py-2 rounded-lg" onclick="nextAppStep(1)">
+                        Continue
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="step-content hidden" id="appStep2">
+                <h4 class="font-bold mb-4">Required Documents</h4>
+                
+                <div class="space-y-6 mb-6">
+                    <!-- ID/Passport -->
+                    <div>
+                        <h5 class="font-medium mb-3">ID/Passport</h5>
+                        <div class="application-card" onclick="uploadDocument('id')">
+                            <i class="fas fa-id-card text-primary text-3xl mb-3"></i>
+                            <p class="font-medium">Upload ID/Passport</p>
+                            <p class="text-sm text-mutedText mt-1">Front and back</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Certificate -->
+                    <div>
+                        <h5 class="font-medium mb-3">Work Certificate</h5>
+                        <div class="application-card" onclick="uploadDocument('certificate')">
+                            <i class="fas fa-certificate text-accent text-3xl mb-3"></i>
+                            <p class="font-medium">Upload Certificate</p>
+                            <p class="text-sm text-mutedText mt-1">Previous employer certificate</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Health Certificate -->
+                    <div>
+                        <h5 class="font-medium mb-3">Health Certificate</h5>
+                        <div class="application-card" onclick="uploadDocument('health')">
+                            <i class="fas fa-file-medical text-success text-3xl mb-3"></i>
+                            <p class="font-medium">Upload Health Certificate</p>
+                            <p class="text-sm text-mutedText mt-1">Recent medical examination</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between">
+                    <button class="border border-borderGray text-darkText px-6 py-2 rounded-lg" onclick="prevAppStep(2)">
+                        <i class="fas fa-arrow-left mr-2"></i> Back
+                    </button>
+                    <button class="bg-primary text-white px-6 py-2 rounded-lg" onclick="nextAppStep(2)">
+                        Continue
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="step-content hidden" id="appStep3">
+                <h4 class="font-bold mb-4">Work Experience</h4>
+                
+                <div class="space-y-4 mb-6">
+                    <div class="border border-borderGray rounded-lg p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h5 class="font-bold">Caregiver</h5>
+                                <p class="text-sm text-mutedText">Anderson Family • 2 years</p>
+                            </div>
+                            <span class="status-chip bg-success bg-opacity-20 text-success text-xs">Completed</span>
+                        </div>
+                        <p class="text-sm">Full-time live-in caregiver for elderly client. Managed medication, meal preparation, and transportation.</p>
+                    </div>
+                    
+                    <div class="border border-borderGray rounded-lg p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h5 class="font-bold">Cook</h5>
+                                <p class="text-sm text-mutedText">Williams Family • 3 years</p>
+                            </div>
+                            <span class="status-chip bg-success bg-opacity-20 text-success text-xs">Completed</span>
+                        </div>
+                        <p class="text-sm">Specialized in international cuisine. Prepared meals for elderly couple with dietary restrictions.</p>
+                    </div>
+                    
+                    <div class="border border-borderGray rounded-lg p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h5 class="font-bold">Nanny</h5>
+                                <p class="text-sm text-mutedText">Johnson Family • 2 years</p>
+                            </div>
+                            <span class="status-chip bg-warning bg-opacity-20 text-warning text-xs">Ongoing</span>
+                        </div>
+                        <p class="text-sm">Part-time nanny for working couple. Cared for 2 children ages 5 and 8. School pickup and homework help.</p>
+                    </div>
+                </div>
+                
+                <div class="form-group mb-6">
+                    <label class="form-label">Why are you interested in this position?</label>
+                    <textarea class="form-textarea" rows="3" placeholder="Explain your interest in this specific job...">I'm particularly interested in this position because of my experience with live-in arrangements and my ability to provide comprehensive care for seniors.</textarea>
+                </div>
+                
+                <div class="flex justify-between">
+                    <button class="border border-borderGray text-darkText px-6 py-2 rounded-lg" onclick="prevAppStep(3)">
+                        <i class="fas fa-arrow-left mr-2"></i> Back
+                    </button>
+                    <button class="bg-primary text-white px-6 py-2 rounded-lg" onclick="nextAppStep(3)">
+                        Continue
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="step-content hidden" id="appStep4">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-success bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-check text-success text-2xl"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-2">Application Submitted!</h4>
+                    <p class="text-mutedText">Your application for Live-in Caregiver has been submitted successfully.</p>
+                </div>
+                
+                <div class="bg-lightGray rounded-lg p-4 mb-6">
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-mutedText">Application ID:</span>
+                            <span class="font-medium">APP-2024-00156</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-mutedText">Submitted:</span>
+                            <span class="font-medium">July 25, 2024</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-mutedText">Documents:</span>
+                            <span class="font-medium text-success">3 files uploaded</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-mutedText">Status:</span>
+                            <span class="font-medium text-warning">Under Review</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button class="bg-primary text-white px-6 py-2 rounded-lg" onclick="finishApplication()">
+                        Finish
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Upload Modal -->
+    <div class="modal" id="documentModal">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Upload Document</h3>
+                <button class="text-mutedText" onclick="closeModal('documentModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="form-group mb-6">
+                <label class="form-label">Select File</label>
+                <div class="border-2 border-dashed border-borderGray rounded-lg p-8 text-center cursor-pointer hover:border-primary">
+                    <i class="fas fa-cloud-upload-alt text-primary text-3xl mb-3"></i>
+                    <p class="font-medium mb-1">Drag & drop files here</p>
+                    <p class="text-sm text-mutedText mb-3">or click to browse</p>
+                    <p class="text-xs text-mutedText">Supported formats: PDF, JPG, PNG (Max 10MB)</p>
+                </div>
+            </div>
+            
+            <div class="flex justify-end gap-3">
+                <button class="border border-borderGray text-darkText px-6 py-2 rounded-lg" onclick="closeModal('documentModal')">
+                    Cancel
+                </button>
+                <button class="bg-primary text-white px-6 py-2 rounded-lg" onclick="documentUploaded()">
+                    Upload
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Menu functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const closeMenu = document.getElementById('closeMenu');
+            const menuPanel = document.getElementById('menuPanel');
+            const menuOverlay = document.getElementById('menuOverlay');
+            
+            menuToggle.addEventListener('click', function() {
+                menuPanel.classList.add('active');
+                menuOverlay.style.display = 'block';
+            });
+            
+            closeMenu.addEventListener('click', function() {
+                menuPanel.classList.remove('active');
+                menuOverlay.style.display = 'none';
+            });
+            
+            menuOverlay.addEventListener('click', function() {
+                menuPanel.classList.remove('active');
+                menuOverlay.style.display = 'none';
+            });
+        });
+
+        // Application flow variables
+        let currentAppStep = 1;
+        const totalAppSteps = 4;
+        let currentJob = '';
+
+        // Job details data
+        const jobDetails = {
+            anderson: {
+                title: "Live-in Caregiver",
+                employer: "Anderson Family",
+                location: "Downtown",
+                description: "We are looking for an experienced live-in caregiver to assist our elderly family member. The ideal candidate should have experience with senior care and household management.",
+                requirements: [
+                    "5+ years of experience as a caregiver",
+                    "Fluent in English and Spanish",
+                    "Valid health certificate",
+                    "First aid certification",
+                    "References from previous employers"
+                ],
+                benefits: [
+                    "Private accommodation provided",
+                    "Monthly salary of $1,550",
+                    "Paid time off",
+                    "Health insurance",
+                    "Weekly day off"
+                ],
+                salary: "$1,550/month",
+                startDate: "August 1, 2024",
+                duration: "6 months (renewable)",
+                type: "Live-in"
+            },
+            johnson: {
+                title: "Part-time Nanny",
+                employer: "Johnson Family",
+                location: "Suburbs",
+                description: "Part-time nanny needed for our two children. Hours are flexible but typically 20 hours per week. School pickup and homework help required.",
+                requirements: [
+                    "2+ years of nanny experience",
+                    "Experience with children aged 5-10",
+                    "Patient and responsible",
+                    "Fluent in English",
+                    "Valid driver's license"
+                ],
+                benefits: [
+                    "Competitive hourly rate",
+                    "Flexible schedule",
+                    "Transportation provided",
+                    "Bonus for excellent performance",
+                    "Professional development opportunities"
+                ],
+                salary: "$300/week",
+                startDate: "August 5, 2024",
+                duration: "Ongoing",
+                type: "Part-time"
+            },
+            williams: {
+                title: "Experienced Cook",
+                employer: "Williams Family",
+                location: "Uptown",
+                description: "We are seeking an experienced cook to prepare meals for our elderly parents. Must be able to accommodate dietary restrictions and preferences.",
+                requirements: [
+                    "5+ years of cooking experience",
+                    "Knowledge of international cuisine",
+                    "Health certificate",
+                    "References from previous employers",
+                    "Experience with dietary restrictions"
+                ],
+                benefits: [
+                    "Accommodation provided",
+                    "Monthly salary of $1,500",
+                    "Paid time off",
+                    "Health insurance",
+                    "Grocery allowance"
+                ],
+                salary: "$1,500/month",
+                startDate: "August 10, 2024",
+                duration: "6 months (renewable)",
+                type: "Live-in"
+            }
+        };
+
+        // View job details
+        function viewJobDetails(jobId) {
+            const job = jobDetails[jobId];
+            if (job) {
+                const content = document.getElementById('jobDetailsContent');
+                content.innerHTML = `
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-primary bg-opacity-10 flex items-center justify-center mr-4">
+                            <i class="fas fa-briefcase text-primary"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg">${job.title}</h4>
+                            <p class="text-mutedText">${job.employer} • ${job.location}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div>
+                            <p class="text-mutedText text-sm">Salary</p>
+                            <p class="font-medium">${job.salary}</p>
+                        </div>
+                        <div>
+                            <p class="text-mutedText text-sm">Start Date</p>
+                            <p class="font-medium">${job.startDate}</p>
+                        </div>
+                        <div>
+                            <p class="text-mutedText text-sm">Type</p>
+                            <p class="font-medium">${job.type}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h5 class="font-bold mb-2">Job Description</h5>
+                        <p class="text-mutedText">${job.description}</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <h5 class="font-bold mb-2">Requirements</h5>
+                            <ul class="list-disc list-inside text-mutedText space-y-1">
+                                ${job.requirements.map(req => `<li>${req}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div>
+                            <h5 class="font-bold mb-2">Benefits</h5>
+                            <ul class="list-disc list-inside text-mutedText space-y-1">
+                                ${job.benefits.map(benefit => `<li>${benefit}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                openModal('jobDetailsModal');
+            }
+        }
+
+        // Apply for job
+        function applyForJob(jobId) {
+            currentJob = jobId;
+            openModal('applicationModal');
+        }
+
+        function applyForJobFromModal() {
+            closeModal('jobDetailsModal');
+            openModal('applicationModal');
+        }
+
+        // Application flow navigation
+        function nextAppStep(current) {
+            if (current < totalAppSteps) {
+                document.getElementById(`appStep${current}`).classList.add('hidden');
+                document.getElementById(`appStep${current + 1}`).classList.remove('hidden');
+                currentAppStep = current + 1;
+                updateAppProgress();
+                updateAppStepIndicator();
+            }
+        }
+
+        function prevAppStep(current) {
+            if (current > 1) {
+                document.getElementById(`appStep${current}`).classList.add('hidden');
+                document.getElementById(`appStep${current - 1}`).classList.remove('hidden');
+                currentAppStep = current - 1;
+                updateAppProgress();
+                updateAppStepIndicator();
+            }
+        }
+
+        function updateAppProgress() {
+            const progress = (currentAppStep / totalAppSteps) * 100;
+            document.getElementById('appProgressFill').style.width = `${progress}%`;
+        }
+
+        function updateAppStepIndicator() {
+            // Reset all steps
+            for (let i = 1; i <= totalAppSteps; i++) {
+                const step = document.getElementById(`appStep${i}Indicator`);
+                step.classList.remove('active', 'completed');
+                if (i < currentAppStep) {
+                    step.classList.add('completed');
+                } else if (i === currentAppStep) {
+                    step.classList.add('active');
+                }
+            }
+        }
+
+        // Document upload
+        function uploadDocument(type) {
+            openModal('documentModal');
+        }
+
+        function documentUploaded() {
+            alert('Document uploaded successfully!');
+            closeModal('documentModal');
+        }
+
+        // Finish application
+        function finishApplication() {
+            alert('Application completed! You will be notified of the results.');
+            closeModal('applicationModal');
+            resetApplicationFlow();
+        }
+
+        function resetApplicationFlow() {
+            // Reset to step 1
+            for (let i = 2; i <= totalAppSteps; i++) {
+                document.getElementById(`appStep${i}`).classList.add('hidden');
+            }
+            document.getElementById('appStep1').classList.remove('hidden');
+            currentAppStep = 1;
+            updateAppProgress();
+            updateAppStepIndicator();
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+```

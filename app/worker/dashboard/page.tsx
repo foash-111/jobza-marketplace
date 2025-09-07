@@ -6,8 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar, Users, Clock, Building2, AlertCircle } from "lucide-react"
-import { WorkerSidebar } from "@/components/layout/worker-sidebar"
+import { UnifiedSidebar } from "@/components/layout/unified-sidebar"
 import { JobDetailsModal } from "@/components/jobs/job-details-modal"
 import { SharedHeader } from "@/components/layout/shared-header"
 
@@ -15,13 +16,13 @@ export default function WorkerDashboard() {
   const [activeTab, setActiveTab] = useState("overview")
   const [selectedJob, setSelectedJob] = useState(null)
   const [isJobDetailsOpen, setIsJobDetailsOpen] = useState(false)
-  const [affiliationRequests, setAffiliationRequests] = useState([])
+  const [affiliationRequests, setAffiliationRequests] = useState<any[]>([])
   const [showCancelMessage, setShowCancelMessage] = useState(false)
   const [showAcceptWarning, setShowAcceptWarning] = useState(false)
-  const [pendingAcceptanceId, setPendingAcceptanceId] = useState(null)
-  const [affiliationHistory, setAffiliationHistory] = useState([])
+  const [pendingAcceptanceId, setPendingAcceptanceId] = useState<number | null>(null)
+  const [affiliationHistory, setAffiliationHistory] = useState<any[]>([])
   const [affiliationSubTab, setAffiliationSubTab] = useState('incoming')
-  const [outgoingAffiliationRequests, setOutgoingAffiliationRequests] = useState([])
+  const [outgoingAffiliationRequests, setOutgoingAffiliationRequests] = useState<any[]>([])
   const router = useRouter()
 
   // Initialize affiliation requests on component mount
@@ -249,10 +250,14 @@ export default function WorkerDashboard() {
 
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <WorkerSidebar />
-
-      <div className="flex-1 p-6">
+    <div className="min-h-screen bg-background">
+      <UnifiedSidebar 
+        userRole="worker"
+        userName="Sarah Johnson"
+        userEmail="sarah@example.com"
+      />
+      
+      <div className="lg:ml-64 p-6">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <SharedHeader 
@@ -302,18 +307,42 @@ export default function WorkerDashboard() {
                 <AlertCircle className="h-5 w-5 text-amber-600" />
                 <p className="text-amber-800 dark:text-amber-200">
                   You cannot cancel an affiliation relationship before 14 days have passed since acceptance. 
-                  Please wait until {(new Date().getTime() + (14 * 24 * 60 * 60 * 1000)).toLocaleDateString()} to cancel.
+                  Please wait until {new Date(Date.now() + (14 * 24 * 60 * 60 * 1000)).toLocaleDateString()} to cancel.
                 </p>
               </div>
             </div>
           )}
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="long-term">Long Term</TabsTrigger>
-              <TabsTrigger value="short-term">Short Term</TabsTrigger>
-              <TabsTrigger value="affiliation-requests">Affiliation Requests</TabsTrigger>
+            {/* Mobile dropdown */}
+            <div className="sm:hidden">
+              <Select value={activeTab} onValueChange={setActiveTab}>
+                <SelectTrigger aria-label="Select section">
+                  <SelectValue placeholder="Select section" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="overview">Overview</SelectItem>
+                  <SelectItem value="long-term">Long Term</SelectItem>
+                  <SelectItem value="short-term">Short Term</SelectItem>
+                  <SelectItem value="affiliation-requests">Affiliation Requests</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Desktop/Tablet tab bar */}
+            <TabsList className="hidden sm:grid w-full grid-cols-3 md:grid-cols-4 gap-2">
+              <TabsTrigger value="overview" className="text-xs sm:text-sm">
+                <span>Overview</span>
+              </TabsTrigger>
+              <TabsTrigger value="long-term" className="text-xs sm:text-sm">
+                <span>Long Term</span>
+              </TabsTrigger>
+              <TabsTrigger value="short-term" className="text-xs sm:text-sm">
+                <span>Short Term</span>
+              </TabsTrigger>
+              <TabsTrigger value="affiliation-requests" className="text-xs sm:text-sm">
+                <span>Affiliation Requests</span>
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">
@@ -323,29 +352,33 @@ export default function WorkerDashboard() {
                   <CardDescription>Your active work contracts overview</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {longTermJobs.map((job) => (
-                      <div key={job.id} className="flex items-center justify-between p-3 border rounded-lg bg-card hover-lift transition-theme">
-                        <div>
+                      <div key={job.id} className="flex flex-col p-3 border rounded-lg bg-card hover:shadow-md transition-shadow">
+                        <div className="flex-1">
                           <p className="font-medium text-card-foreground">{job.title}</p>
                           <p className="text-sm text-muted-foreground">
                             {job.agencyName} • {job.budget}
                           </p>
                           <p className="text-xs text-muted-foreground">Long-term contract</p>
                         </div>
-                        <Badge variant="default">Active</Badge>
+                        <div className="mt-2">
+                          <Badge variant="default">Active</Badge>
+                        </div>
                       </div>
                     ))}
                     {shortTermJobs.slice(0, 2).map((job) => (
-                      <div key={job.id} className="flex items-center justify-between p-3 border rounded-lg bg-card hover-lift transition-theme">
-                        <div>
+                      <div key={job.id} className="flex flex-col p-3 border rounded-lg bg-card hover:shadow-md transition-shadow">
+                        <div className="flex-1">
                           <p className="font-medium text-card-foreground">{job.title}</p>
                           <p className="text-sm text-muted-foreground">
                             {job.familyName} • {job.budget}
                           </p>
                           <p className="text-xs text-muted-foreground">Short-term job</p>
                         </div>
-                        <Badge variant="secondary">Active</Badge>
+                        <div className="mt-2">
+                          <Badge variant="secondary">Active</Badge>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -408,35 +441,40 @@ export default function WorkerDashboard() {
                   <CardDescription>Jobs from agencies with extended contracts</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                     {longTermJobs.map((job) => (
-                      <div key={job.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-4">
-                            <Users className="h-5 w-5 text-blue-500" />
-                            <div>
-                              <p className="font-medium">{job.title}</p>
-                              <p className="text-sm text-gray-600">
-                                {job.agencyName} • {job.location}
-                              </p>
-                              <p className="text-sm font-medium text-green-600">{job.budget}</p>
-                              <p className="text-xs text-gray-500">
-                                Contract: {job.startDate} - {job.endDate}
-                              </p>
-                            </div>
+                      <div key={job.id} className="flex flex-col p-4 border rounded-lg bg-card hover:shadow-md transition-shadow">
+                        <div className="flex items-start gap-3 mb-3">
+                          <Users className="h-5 w-5 text-blue-500 mt-1 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-card-foreground truncate">{job.title}</p>
+                            <p className="text-sm text-muted-foreground truncate">
+                              {job.agencyName} • {job.location}
+                            </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="default">Active</Badge>
-                          <Button size="sm" variant="outline" onClick={() => handleViewContract(job.id)}>
+                        <div className="space-y-2 mb-4">
+                          <p className="text-sm font-medium text-green-600">{job.budget}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Contract: {job.startDate} - {job.endDate}
+                          </p>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-2 mt-auto">
+                          <Badge variant="default" className="w-fit">Active</Badge>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => handleViewContract(job.id)}
+                            className="flex-1 sm:flex-none"
+                          >
                             View Contract
                           </Button>
                         </div>
                       </div>
                     ))}
                     {longTermJobs.length === 0 && (
-                      <div className="text-center py-8 text-gray-500">
-                        <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                      <div className="col-span-full text-center py-8 text-muted-foreground">
+                        <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
                         <p>No long-term jobs available</p>
                         <p className="text-sm">Check back later for agency opportunities</p>
                       </div>
@@ -453,32 +491,44 @@ export default function WorkerDashboard() {
                   <CardDescription>Direct jobs from families for temporary work</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                     {shortTermJobs.map((job) => (
-                      <div key={job.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-4">
-                            <Calendar className="h-5 w-5 text-pink-500" />
-                            <div>
-                              <p className="font-medium">{job.title}</p>
-                              <p className="text-sm text-gray-600">
-                                {job.familyName} • {job.location}
-                              </p>
-                              <p className="text-sm font-medium text-green-600">{job.budget}</p>
-                              <p className="text-xs text-gray-500">
-                                Duration: {job.startDate} - {job.endDate}
-                              </p>
-                            </div>
+                      <div key={job.id} className="flex flex-col p-4 border rounded-lg bg-card hover:shadow-md transition-shadow">
+                        <div className="flex items-start gap-3 mb-3">
+                          <Calendar className="h-5 w-5 text-pink-500 mt-1 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-card-foreground truncate">{job.title}</p>
+                            <p className="text-sm text-muted-foreground truncate">
+                              {job.familyName} • {job.location}
+                            </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="secondary">Active</Badge>
-                          <Button size="sm" variant="outline" onClick={() => handleViewDetails(job)}>
+                        <div className="space-y-2 mb-4">
+                          <p className="text-sm font-medium text-green-600">{job.budget}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Duration: {job.startDate} - {job.endDate}
+                          </p>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-2 mt-auto">
+                          <Badge variant="secondary" className="w-fit">Active</Badge>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => handleViewDetails(job)}
+                            className="flex-1 sm:flex-none"
+                          >
                             View Details
                           </Button>
                         </div>
                       </div>
                     ))}
+                    {shortTermJobs.length === 0 && (
+                      <div className="col-span-full text-center py-8 text-muted-foreground">
+                        <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                        <p>No short-term jobs available</p>
+                        <p className="text-sm">Check back later for family opportunities</p>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -531,65 +581,70 @@ export default function WorkerDashboard() {
                   {affiliationSubTab === 'incoming' && (
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold text-card-foreground mb-4">Incoming Requests</h3>
-                      {affiliationRequests
-                        .filter(request => request.status === "pending_acceptance")
-                        .map((request) => (
-                          <div
-                            key={request.id}
-                            className="flex items-center justify-between p-4 border rounded-lg bg-card hover-lift transition-theme"
-                          >
-                            <div className="flex-1">
-                              <div className="flex items-center gap-4">
-                                <Building2 className="h-5 w-5 text-primary" />
-                                <div>
-                                  <p className="font-medium text-card-foreground">{request.agencyName}</p>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {affiliationRequests
+                          .filter(request => request.status === "pending_acceptance")
+                          .map((request) => (
+                            <div
+                              key={request.id}
+                              className="flex flex-col p-4 border rounded-lg bg-card hover:shadow-md transition-shadow"
+                            >
+                              <div className="flex items-start gap-3 mb-3">
+                                <Building2 className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-card-foreground truncate">{request.agencyName}</p>
                                   <p className="text-sm text-muted-foreground">
                                     📍 {request.agencyLocation} • ⭐ {request.agencyRating} ({request.agencyReviews} reviews)
                                   </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    Services: {request.agencyServices.slice(0, 3).join(", ")}
-                                    {request.agencyServices.length > 3 && "..."}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    Request received: {request.requestDate}
-                                  </p>
+                                </div>
+                              </div>
+                              <div className="space-y-2 mb-4">
+                                <p className="text-xs text-muted-foreground">
+                                  Services: {request.agencyServices.slice(0, 3).join(", ")}
+                                  {request.agencyServices.length > 3 && "..."}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  Request received: {request.requestDate}
+                                </p>
+                              </div>
+                              <div className="flex flex-col sm:flex-row gap-2 mt-auto">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleViewAgencyDetails(request.id)}
+                                  className="flex-1 sm:flex-none"
+                                >
+                                  View Details
+                                </Button>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-destructive border-destructive/20 hover:bg-destructive/10 bg-transparent flex-1"
+                                    onClick={() => handleRejectAffiliation(request.id)}
+                                  >
+                                    Decline
+                                  </Button>
+                                  <Button 
+                                    size="sm" 
+                                    className="bg-green-600 hover:bg-green-700 flex-1"
+                                    onClick={() => handleAcceptAffiliation(request.id)}
+                                  >
+                                    Accept
+                                  </Button>
                                 </div>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleViewAgencyDetails(request.id)}
-                              >
-                                View Details
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="text-destructive border-destructive/20 hover:bg-destructive/10 bg-transparent"
-                                onClick={() => handleRejectAffiliation(request.id)}
-                              >
-                                Decline
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                className="bg-green-600 hover:bg-green-700"
-                                onClick={() => handleAcceptAffiliation(request.id)}
-                              >
-                                Accept
-                              </Button>
-                            </div>
+                          ))}
+                        
+                        {affiliationRequests.filter(request => request.status === "pending_acceptance").length === 0 && (
+                          <div className="col-span-full text-center py-8 text-muted-foreground">
+                            <Building2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                            <p>No incoming affiliation requests</p>
+                            <p className="text-sm">Agencies will send you affiliation requests when they're interested in working with you</p>
                           </div>
-                        ))}
-                      
-                      {affiliationRequests.filter(request => request.status === "pending_acceptance").length === 0 && (
-                        <div className="text-center py-8 text-muted-foreground">
-                          <Building2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-                          <p>No incoming affiliation requests</p>
-                          <p className="text-sm">Agencies will send you affiliation requests when they're interested in working with you</p>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                   )}
 
@@ -597,54 +652,56 @@ export default function WorkerDashboard() {
                   {affiliationSubTab === 'outgoing' && (
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold text-card-foreground mb-4">Outgoing Requests</h3>
-                      {outgoingAffiliationRequests
-                        .filter(request => request.status === "pending")
-                        .map((request) => (
-                          <div
-                            key={request.id}
-                            className="flex items-center justify-between p-4 border rounded-lg bg-card hover-lift transition-theme"
-                          >
-                            <div className="flex-1">
-                              <div className="flex items-center gap-4">
-                                <Building2 className="h-5 w-5 text-primary" />
-                                <div>
-                                  <p className="font-medium text-card-foreground">{request.agencyName}</p>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {outgoingAffiliationRequests
+                          .filter(request => request.status === "pending")
+                          .map((request) => (
+                            <div
+                              key={request.id}
+                              className="flex flex-col p-4 border rounded-lg bg-card hover:shadow-md transition-shadow"
+                            >
+                              <div className="flex items-start gap-3 mb-3">
+                                <Building2 className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-card-foreground truncate">{request.agencyName}</p>
                                   <p className="text-sm text-muted-foreground">
                                     📍 {request.agencyLocation} • ⭐ {request.agencyRating} ({request.agencyReviews} reviews)
                                   </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    Services: {request.agencyServices.slice(0, 3).join(", ")}
-                                    {request.agencyReviews.length > 3 && "..."}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    Request sent: {request.requestDate}
-                                  </p>
                                 </div>
                               </div>
+                              <div className="space-y-2 mb-4">
+                                <p className="text-xs text-muted-foreground">
+                                  Services: {request.agencyServices.slice(0, 3).join(", ")}
+                                  {request.agencyServices.length > 3 && "..."}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  Request sent: {request.requestDate}
+                                </p>
+                              </div>
+                              <div className="flex flex-col sm:flex-row gap-2 mt-auto">
+                                <Badge variant="outline" className="text-yellow-600 border-yellow-300 w-fit">
+                                  Pending
+                                </Badge>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-destructive border-destructive/20 hover:bg-destructive/10 bg-transparent flex-1 sm:flex-none"
+                                  onClick={() => handleCancelOutgoingRequest(request.id)}
+                                >
+                                  Cancel Request
+                                </Button>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="text-yellow-600 border-yellow-300">
-                                Pending
-                              </Badge>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="text-destructive border-destructive/20 hover:bg-destructive/10 bg-transparent"
-                                onClick={() => handleCancelOutgoingRequest(request.id)}
-                              >
-                                Cancel Request
-                              </Button>
-                            </div>
+                          ))}
+                        
+                        {outgoingAffiliationRequests.filter(request => request.status === "pending").length === 0 && (
+                          <div className="col-span-full text-center py-8 text-muted-foreground">
+                            <Building2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                            <p>No outgoing affiliation requests</p>
+                            <p className="text-sm">Send affiliation requests to agencies you're interested in working with</p>
                           </div>
-                        ))}
-                      
-                      {outgoingAffiliationRequests.filter(request => request.status === "pending").length === 0 && (
-                        <div className="text-center py-8 text-muted-foreground">
-                          <Building2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-                          <p>No outgoing affiliation requests</p>
-                          <p className="text-sm">Send affiliation requests to agencies you're interested in working with</p>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                   )}
 
@@ -659,41 +716,43 @@ export default function WorkerDashboard() {
                           <p className="text-sm">Your declined and past affiliation requests will appear here</p>
                         </div>
                       ) : (
-                        affiliationHistory.map((request) => (
-                          <div
-                            key={request.id}
-                            className="flex items-center justify-between p-4 border rounded-lg bg-card hover-lift transition-theme opacity-75"
-                          >
-                            <div className="flex-1">
-                              <div className="flex items-center gap-4">
-                                <Building2 className="h-5 w-5 text-muted-foreground" />
-                                <div>
-                                  <p className="font-medium text-card-foreground">{request.agencyName}</p>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                          {affiliationHistory.map((request) => (
+                            <div
+                              key={request.id}
+                              className="flex flex-col p-4 border rounded-lg bg-card hover:shadow-md transition-shadow opacity-75"
+                            >
+                              <div className="flex items-start gap-3 mb-3">
+                                <Building2 className="h-5 w-5 text-muted-foreground mt-1 flex-shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-card-foreground truncate">{request.agencyName}</p>
                                   <p className="text-sm text-muted-foreground">
                                     📍 {request.agencyLocation} • ⭐ {request.agencyRating} ({request.agencyReviews} reviews)
                                   </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    Services: {request.agencyServices.slice(0, 3).join(", ")}
-                                    {request.agencyServices.length > 3 && "..."}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {request.status === "declined" 
-                                      ? `Declined on: ${request.requestDate}` 
-                                      : `Request received: ${request.requestDate}`}
-                                  </p>
                                 </div>
                               </div>
+                              <div className="space-y-2 mb-4">
+                                <p className="text-xs text-muted-foreground">
+                                  Services: {request.agencyServices.slice(0, 3).join(", ")}
+                                  {request.agencyServices.length > 3 && "..."}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {request.status === "declined" 
+                                    ? `Declined on: ${request.requestDate}` 
+                                    : `Request received: ${request.requestDate}`}
+                                </p>
+                              </div>
+                              <div className="mt-auto">
+                                <Badge 
+                                  variant={request.status === "declined" ? "secondary" : "outline"}
+                                  className="text-xs w-fit"
+                                >
+                                  {request.status === "declined" ? "Declined" : request.status}
+                                </Badge>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Badge 
-                                variant={request.status === "declined" ? "secondary" : "outline"}
-                                className="text-xs"
-                              >
-                                {request.status === "declined" ? "Declined" : request.status}
-                              </Badge>
-                            </div>
-                          </div>
-                        ))
+                          ))}
+                        </div>
                       )}
                     </div>
                   )}

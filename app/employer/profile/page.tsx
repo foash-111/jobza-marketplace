@@ -70,7 +70,7 @@ export default function EmployerProfile() {
     "Organization",
   ])
 
-  const [documents, setDocuments] = useState({
+  const [documents, setDocuments] = useState<Record<string, File | null>>({
     nationalId: null,
     proofOfAddress: null,
     employmentLetter: null,
@@ -138,7 +138,7 @@ export default function EmployerProfile() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-background">
       <div className="flex-1 p-6">
         <div className="mb-6">
           <Link href="/employer/dashboard">
@@ -597,7 +597,7 @@ export default function EmployerProfile() {
                           {documents.nationalId ? (
                             <div className="flex items-center justify-center gap-2 text-green-600">
                               <CheckCircle className="w-5 h-5" />
-                              <span className="text-sm">{documents.nationalId.name}</span>
+                              <span className="text-sm">{documents.nationalId?.name}</span>
                             </div>
                           ) : (
                             <div className="flex flex-col items-center gap-2">
@@ -626,7 +626,7 @@ export default function EmployerProfile() {
                           {documents.proofOfAddress ? (
                             <div className="flex items-center justify-center gap-2 text-green-600">
                               <CheckCircle className="w-5 h-5" />
-                              <span className="text-sm">{documents.proofOfAddress.name}</span>
+                              <span className="text-sm">{documents.proofOfAddress?.name}</span>
                             </div>
                           ) : (
                             <div className="flex flex-col items-center gap-2">
@@ -653,7 +653,7 @@ export default function EmployerProfile() {
                           {documents.employmentLetter ? (
                             <div className="flex items-center justify-center gap-2 text-green-600">
                               <CheckCircle className="w-5 h-5" />
-                              <span className="text-sm">{documents.employmentLetter.name}</span>
+                              <span className="text-sm">{documents.employmentLetter?.name}</span>
                             </div>
                           ) : (
                             <div className="flex flex-col items-center gap-2">

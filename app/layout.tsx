@@ -1,3 +1,4 @@
+
 import type React from "react"
 import type { Metadata } from "next"
 import { DM_Sans } from "next/font/google"
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
   title: "Jobza - Connect with Trusted Domestic Workers",
   description:
     "Find reliable housekeepers, nannies, cooks, and caregivers. Professional domestic worker marketplace connecting families with verified workers and agencies.",
-  generator: "v0.app",
+  generator: "foash",
 }
 
 export default function RootLayout({

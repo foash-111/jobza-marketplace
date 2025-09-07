@@ -1,4 +1,4 @@
-export type UserRole = "family" | "worker" | "agency" | "admin"
+export type UserRole =  "worker" | "agency" | "admin" | "employer" | "family"
 
 export type JobType = "long-term" | "short-term"
 

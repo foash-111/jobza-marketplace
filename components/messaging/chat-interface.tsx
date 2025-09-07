@@ -81,7 +81,7 @@ export function ChatInterface({ conversation, currentUser, onSendMessage }: Chat
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4bg-background">
         {conversation.messages.map((message) => {
           const isCurrentUser = message.senderId === currentUser.id
           return (
